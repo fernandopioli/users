@@ -64,7 +64,7 @@ public class UserTest {
             User.create(VALID_NAME, INVALID_EMAIL, VALID_PASSWORD);
         });
 
-        assertEquals("Invalid email", exception.getMessage());
+        assertEquals("Invalid email format", exception.getMessage());
     }
 
     @Test
@@ -73,7 +73,7 @@ public class UserTest {
             User.create(VALID_NAME, VALID_EMAIL, SHORT_PASSWORD);
         });
 
-        assertEquals("Password must be at least 6 characters long", exception.getMessage());
+        assertEquals("Field 'password' must have at least 6 characters", exception.getMessage());
     }
 
     @Test

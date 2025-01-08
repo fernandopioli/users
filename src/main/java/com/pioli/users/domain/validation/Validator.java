@@ -1,11 +1,15 @@
 package com.pioli.users.domain.validation;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
+import com.pioli.users.domain.exceptions.InvalidParameterException;
 import com.pioli.users.domain.exceptions.RequiredParameterException;
 
 public final class Validator {
     private Validator() {}
+
+    private static final Pattern EMAIL_REGEX = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
     public static void validateRequired(Map<String, Object> fields) {
         if (fields == null || fields.isEmpty()) {
@@ -20,6 +24,20 @@ public final class Validator {
                     String.format("Field '%s' has an invalid value: '%s'", fieldName, value)
                 );
             }
+        }
+    }
+
+    public static void validateEmailFormat(String email) {
+        if (email == null || !EMAIL_REGEX.matcher(email).matches()) {
+            throw new InvalidParameterException("Invalid email format");
+        }
+    }
+
+    public static void checkMinLength(String value, int minLength, String fieldName) {
+        if (value == null || value.length() < minLength) {
+            throw new InvalidParameterException(
+                String.format("Field '%s' must have at least %d characters", fieldName, minLength)
+            );
         }
     }
 }

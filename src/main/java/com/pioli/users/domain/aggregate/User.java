@@ -44,14 +44,8 @@ public class User extends Aggregate {
         }};
 
         Validator.validateRequired(fields);
-                                                      
-        if (!email.contains("@")) { // TODO: validate email
-            throw new InvalidParameterException("Invalid email");
-        }
-
-        if (password.length() < 6) {
-            throw new InvalidParameterException("Password must be at least 6 characters long");
-        }
+        Validator.validateEmailFormat(email);
+        Validator.checkMinLength(password, 6, "password");
     }
 
     public String getName() {

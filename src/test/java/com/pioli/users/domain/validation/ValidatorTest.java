@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import com.pioli.users.domain.exceptions.InvalidParameterException;
 import com.pioli.users.domain.exceptions.RequiredParameterException;
 
 public class ValidatorTest {
@@ -52,5 +53,82 @@ public class ValidatorTest {
                 "password2", 123456
             ));
         });
+    }
+
+    @Test
+    void checkMinLengthShouldNotThrowWhenValueIsLongEnough() {
+        assertDoesNotThrow(() -> Validator.checkMinLength("abcdef", 6, "password"));
+    }
+
+    @Test
+    void checkMinLengthShouldThrowWhenValueIsTooShort() {
+        InvalidParameterException exception = assertThrows(
+            InvalidParameterException.class,
+            () -> Validator.checkMinLength("abc", 6, "password")
+        );
+
+        assertTrue(exception.getMessage().contains("Field 'password' must have at least 6 characters"));
+    }
+
+    @Test
+    void checkMinLengthShouldThrowWhenValueIsNull() {
+        InvalidParameterException exception = assertThrows(
+            InvalidParameterException.class,
+            () -> Validator.checkMinLength(null, 6, "password")
+        );
+
+        assertTrue(exception.getMessage().contains("Field 'password' must have at least 6 characters"));
+    }
+
+    @Test
+    void validateEmailFormatShouldNotThrowForValidEmail() {
+        assertDoesNotThrow(() -> Validator.validateEmailFormat("john.doe@example.com"));
+        assertDoesNotThrow(() -> Validator.validateEmailFormat("user123+any@subdomain.domain.co"));
+        assertDoesNotThrow(() -> Validator.validateEmailFormat("user.name@domain.org"));
+    }
+
+    @Test
+    void validateEmailFormatShouldThrowForMissingAtSymbol() {
+        InvalidParameterException exception = assertThrows(
+            InvalidParameterException.class,
+            () -> Validator.validateEmailFormat("invalidemail.com")
+        );
+        assertEquals("Invalid email format", exception.getMessage());
+    }
+
+    @Test
+    void validateEmailFormatShouldThrowForMissingUsername() {
+        InvalidParameterException exception = assertThrows(
+            InvalidParameterException.class,
+            () -> Validator.validateEmailFormat("@example.com")
+        );
+        assertEquals("Invalid email format", exception.getMessage());
+    }
+
+    @Test
+    void validateEmailFormatShouldThrowForMissingDomain() {
+        InvalidParameterException exception = assertThrows(
+            InvalidParameterException.class,
+            () -> Validator.validateEmailFormat("username@.com")
+        );
+        assertEquals("Invalid email format", exception.getMessage());
+    }
+
+    @Test
+    void validateEmailFormatShouldThrowForNullEmail() {
+        InvalidParameterException exception = assertThrows(
+            InvalidParameterException.class,
+            () -> Validator.validateEmailFormat(null)
+        );
+        assertEquals("Invalid email format", exception.getMessage());
+    }
+
+    @Test
+    void validateEmailFormatShouldThrowForEmptyString() {
+        InvalidParameterException exception = assertThrows(
+            InvalidParameterException.class,
+            () -> Validator.validateEmailFormat("")
+        );
+        assertEquals("Invalid email format", exception.getMessage());
     }
 }
