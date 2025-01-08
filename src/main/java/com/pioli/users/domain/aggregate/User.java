@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.pioli.users.domain.base.Aggregate;
-import com.pioli.users.domain.exceptions.InvalidParameterException;
 import com.pioli.users.domain.validation.Validator;
 
 public class User extends Aggregate {
