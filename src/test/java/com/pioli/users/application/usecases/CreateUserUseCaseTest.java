@@ -4,15 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.pioli.users.application.interfaces.PasswordHasher;
 import com.pioli.users.application.interfaces.UserRepository;
 import com.pioli.users.domain.aggregate.User;
 import com.pioli.users.domain.exceptions.AlreadyExistsException;
@@ -21,11 +18,13 @@ public class CreateUserUseCaseTest {
     
     private CreateUserUseCase createUserUseCase;
     private UserRepository userRepository;
+    private PasswordHasher passwordHasher;
 
     @BeforeEach
     void setUp() {
         userRepository = mock(UserRepository.class);
-        createUserUseCase = new CreateUserUseCase(userRepository);
+        passwordHasher = mock(PasswordHasher.class);
+        createUserUseCase = new CreateUserUseCase(userRepository, passwordHasher);
     }
 
     @Test
@@ -35,13 +34,15 @@ public class CreateUserUseCaseTest {
         String password = "anyPassword";
 
         when(userRepository.existsByEmail(email)).thenReturn(false);
+        when(passwordHasher.hash("anyPassword")).thenReturn("hashedPassword");
 
         User createdUser = createUserUseCase.execute(name, email, password);
 
         assertNotNull(createdUser);
         assertEquals(name, createdUser.getName());
         assertEquals(email, createdUser.getEmail());
-        assertEquals(password, createdUser.getPassword());
+        assertEquals("hashedPassword", createdUser.getPassword());
+        verify(passwordHasher, times(1)).hash("anyPassword");
         verify(userRepository, times(1)).save(any(User.class));
     }
 
