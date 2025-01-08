@@ -1,0 +1,4 @@
+spring:
+  name: users
+  profiles:
+    active: dev

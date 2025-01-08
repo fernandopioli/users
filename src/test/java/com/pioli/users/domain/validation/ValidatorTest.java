@@ -7,34 +7,36 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import com.pioli.users.domain.exceptions.RequiredParameterException;
+
 public class ValidatorTest {
     @Test
     void shouldThrowExceptionForNullValue() {
-        IllegalArgumentException exceptionNull = assertThrows(IllegalArgumentException.class, () -> {
+        RequiredParameterException exceptionNull = assertThrows(RequiredParameterException.class, () -> {
             Validator.validateRequired((Map<String, Object>) null);
         });
         assertEquals("No fields provided for validation", exceptionNull.getMessage());
 
-        IllegalArgumentException exceptionEmpty = assertThrows(IllegalArgumentException.class, () -> {
+        RequiredParameterException exceptionEmpty = assertThrows(RequiredParameterException.class, () -> {
             Validator.validateRequired(Map.of());
         });
         assertEquals("No fields provided for validation", exceptionEmpty.getMessage());
     }
     @Test
     void shouldThrowExceptionForNullOrEmptyValues() {
-        IllegalArgumentException exceptionNull = assertThrows(IllegalArgumentException.class, () -> {
+        RequiredParameterException exceptionNull = assertThrows(RequiredParameterException.class, () -> {
             Map<String, Object> fields = new HashMap<>();
             fields.put("name", null);
             Validator.validateRequired(fields);
         });
         assertEquals("Field 'name' has an invalid value: 'null'", exceptionNull.getMessage());
 
-        IllegalArgumentException exceptionEmpty = assertThrows(IllegalArgumentException.class, () -> {
+        RequiredParameterException exceptionEmpty = assertThrows(RequiredParameterException.class, () -> {
             Validator.validateRequired(Map.of("email", ""));
         });
         assertEquals("Field 'email' has an invalid value: ''", exceptionEmpty.getMessage());
 
-        IllegalArgumentException exceptionSpace = assertThrows(IllegalArgumentException.class, () -> {
+        RequiredParameterException exceptionSpace = assertThrows(RequiredParameterException.class, () -> {
             Validator.validateRequired(Map.of("password", " "));
         });
         assertEquals("Field 'password' has an invalid value: ' '", exceptionSpace.getMessage());

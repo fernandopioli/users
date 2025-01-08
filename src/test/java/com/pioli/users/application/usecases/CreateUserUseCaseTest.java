@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import com.pioli.users.application.interfaces.UserRepository;
 import com.pioli.users.domain.aggregate.User;
+import com.pioli.users.domain.exceptions.AlreadyExistsException;
 
 public class CreateUserUseCaseTest {
     
@@ -50,7 +51,7 @@ public class CreateUserUseCaseTest {
 
         when(userRepository.existsByEmail(email)).thenReturn(true);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        AlreadyExistsException exception = assertThrows(AlreadyExistsException.class, () -> {
             createUserUseCase.execute("Any Name", email, "anyPassword");
         });
 

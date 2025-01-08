@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.pioli.users.domain.base.Aggregate;
+import com.pioli.users.domain.exceptions.InvalidParameterException;
 import com.pioli.users.domain.validation.Validator;
 
 public class User extends Aggregate {
@@ -45,11 +46,11 @@ public class User extends Aggregate {
         Validator.validateRequired(fields);
                                                       
         if (!email.contains("@")) { // TODO: validate email
-            throw new IllegalArgumentException("Invalid email");
+            throw new InvalidParameterException("Invalid email");
         }
 
         if (password.length() < 6) {
-            throw new IllegalArgumentException("Password must be at least 6 characters long");
+            throw new InvalidParameterException("Password must be at least 6 characters long");
         }
     }
 

@@ -2,6 +2,8 @@ package com.pioli.users.domain.aggregate;
 
 import java.time.LocalDateTime;
 import com.pioli.users.domain.base.Aggregate;
+import com.pioli.users.domain.exceptions.InvalidParameterException;
+import com.pioli.users.domain.exceptions.RequiredParameterException;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,19 +39,19 @@ public class UserTest {
 
     @Test
     void shouldThrowExceptionForRequiredParams() {
-        IllegalArgumentException exceptionName = assertThrows(IllegalArgumentException.class, () -> {
+        RequiredParameterException exceptionName = assertThrows(RequiredParameterException.class, () -> {
             User.create("", VALID_EMAIL, VALID_PASSWORD);
         });
 
         assertEquals("Field 'name' has an invalid value: ''", exceptionName.getMessage());
 
-        IllegalArgumentException exceptionEmail = assertThrows(IllegalArgumentException.class, () -> {
+        RequiredParameterException exceptionEmail = assertThrows(RequiredParameterException.class, () -> {
             User.create(VALID_NAME, "", VALID_PASSWORD);
         });
 
         assertEquals("Field 'email' has an invalid value: ''", exceptionEmail.getMessage());
 
-        IllegalArgumentException exceptionPassword = assertThrows(IllegalArgumentException.class, () -> {
+        RequiredParameterException exceptionPassword = assertThrows(RequiredParameterException.class, () -> {
             User.create(VALID_NAME, VALID_EMAIL, "");
         });
 
@@ -58,7 +60,7 @@ public class UserTest {
 
     @Test
     void shouldThrowExceptionForInvalidEmail() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        InvalidParameterException exception = assertThrows(InvalidParameterException.class, () -> {
             User.create(VALID_NAME, INVALID_EMAIL, VALID_PASSWORD);
         });
 
@@ -67,7 +69,7 @@ public class UserTest {
 
     @Test
     void shouldThrowExceptionForShortPassword() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        InvalidParameterException exception = assertThrows(InvalidParameterException.class, () -> {
             User.create(VALID_NAME, VALID_EMAIL, SHORT_PASSWORD);
         });
 
