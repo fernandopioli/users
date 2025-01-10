@@ -16,6 +16,13 @@ public abstract class Entity {
         this.deletedAt = null;
     }
 
+    protected Entity(UUID id, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt) {
+        this.id = id;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.deletedAt = deletedAt;
+    }
+
     public void updateTimestamps() {
         this.updatedAt = LocalDateTime.now();
     }

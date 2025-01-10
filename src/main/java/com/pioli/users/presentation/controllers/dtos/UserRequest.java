@@ -1,12 +1,12 @@
 package com.pioli.users.presentation.controllers.dtos;
 
-public class CreateUserRequest {
+public class UserRequest {
     private String name;
     private String email;
     private String password;
 
 
-    public CreateUserRequest() {
+    public UserRequest() {
     }
 
     public String getName() {

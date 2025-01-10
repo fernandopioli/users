@@ -13,6 +13,7 @@ import com.pioli.users.application.interfaces.PasswordHasher;
 import com.pioli.users.application.interfaces.UserRepository;
 import com.pioli.users.domain.aggregate.User;
 import com.pioli.users.domain.exceptions.AlreadyExistsException;
+import com.pioli.users.domain.exceptions.InvalidParameterException;
 
 public class CreateUserUseCaseTest {
     
@@ -57,6 +58,22 @@ public class CreateUserUseCaseTest {
         });
 
         assertEquals("Email already exists", exception.getMessage());
+        verify(userRepository, never()).save(any(User.class));
+        verify(passwordHasher, never()).hash(anyString());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenPasswordIsInvalid() {
+        String password = "123";
+
+        when(userRepository.existsByEmail("any@mail.com")).thenReturn(false);
+
+        InvalidParameterException exception = assertThrows(InvalidParameterException.class, () -> {
+            createUserUseCase.execute("Any Name", "any@mail.com", password);
+        });
+
+        assertEquals("Field 'password' must have at least 6 characters", exception.getMessage());
+        verify(passwordHasher, never()).hash(anyString());
         verify(userRepository, never()).save(any(User.class));
     }
 }

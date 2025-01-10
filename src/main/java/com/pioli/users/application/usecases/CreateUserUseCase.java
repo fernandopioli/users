@@ -19,8 +19,10 @@ public class CreateUserUseCase {
             throw new AlreadyExistsException("Email already exists");
         }
 
+        User.validatePassword(password);
+
         String hashedPassword = passwordHasher.hash(password);
-System.err.println(hashedPassword);
+
         User user = User.create(name, email, hashedPassword);
         userRepository.save(user);
         return user;

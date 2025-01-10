@@ -2,82 +2,55 @@ package com.pioli.users.domain.validation;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.pioli.users.domain.exceptions.InvalidParameterException;
+import com.pioli.users.domain.exceptions.RequiredParameterException;
+import org.junit.jupiter.api.Test;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.jupiter.api.Test;
-
-import com.pioli.users.domain.exceptions.InvalidParameterException;
-import com.pioli.users.domain.exceptions.RequiredParameterException;
-
 public class ValidatorTest {
+
     @Test
-    void shouldThrowExceptionForNullValue() {
-        RequiredParameterException exceptionNull = assertThrows(RequiredParameterException.class, () -> {
-            Validator.validateRequired((Map<String, Object>) null);
-        });
-        assertEquals("No fields provided for validation", exceptionNull.getMessage());
+    void shouldThrowExceptionWhenRequiredFieldsAreMissing() {
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("name", null);
+        fields.put("email", "");
 
-        RequiredParameterException exceptionEmpty = assertThrows(RequiredParameterException.class, () -> {
-            Validator.validateRequired(Map.of());
+        RequiredParameterException exception = assertThrows(RequiredParameterException.class, () -> {
+            Validator.validateRequiredFields(fields);
         });
-        assertEquals("No fields provided for validation", exceptionEmpty.getMessage());
-    }
-    @Test
-    void shouldThrowExceptionForNullOrEmptyValues() {
-        RequiredParameterException exceptionNull = assertThrows(RequiredParameterException.class, () -> {
-            Map<String, Object> fields = new HashMap<>();
-            fields.put("name", null);
-            Validator.validateRequired(fields);
-        });
-        assertEquals("Field 'name' has an invalid value: 'null'", exceptionNull.getMessage());
-
-        RequiredParameterException exceptionEmpty = assertThrows(RequiredParameterException.class, () -> {
-            Validator.validateRequired(Map.of("email", ""));
-        });
-        assertEquals("Field 'email' has an invalid value: ''", exceptionEmpty.getMessage());
-
-        RequiredParameterException exceptionSpace = assertThrows(RequiredParameterException.class, () -> {
-            Validator.validateRequired(Map.of("password", " "));
-        });
-        assertEquals("Field 'password' has an invalid value: ' '", exceptionSpace.getMessage());
+        assertEquals("Field 'name' is required and cannot be empty", exception.getMessage());
     }
 
     @Test
-    void shouldNotThrowExceptionForValidValues() {
+    void shouldValidateRequiredFieldSuccessfully() {
         assertDoesNotThrow(() -> {
-            Validator.validateRequired(Map.of(
-                "name", "John Doe",
-                "email", "john.doe@example.com",
-                "password", "securePassword123",
-                "password2", 123456
-            ));
+            Validator.validateRequiredField("name", "Valid Name");
         });
     }
 
     @Test
-    void checkMinLengthShouldNotThrowWhenValueIsLongEnough() {
-        assertDoesNotThrow(() -> Validator.checkMinLength("abcdef", 6, "password"));
+    void shouldThrowExceptionWhenRequiredFieldIsNull() {
+        RequiredParameterException exception = assertThrows(RequiredParameterException.class, () -> {
+            Validator.validateRequiredField("email", null);
+        });
+        assertEquals("Field 'email' is required and cannot be empty", exception.getMessage());
     }
 
     @Test
-    void checkMinLengthShouldThrowWhenValueIsTooShort() {
-        InvalidParameterException exception = assertThrows(
-            InvalidParameterException.class,
-            () -> Validator.checkMinLength("abc", 6, "password")
-        );
-
-        assertTrue(exception.getMessage().contains("Field 'password' must have at least 6 characters"));
+    void shouldThrowExceptionWhenRequiredFieldIsEmpty() {
+        RequiredParameterException exception = assertThrows(RequiredParameterException.class, () -> {
+            Validator.validateRequiredField("email", "   ");
+        });
+        assertEquals("Field 'email' is required and cannot be empty", exception.getMessage());
     }
 
     @Test
-    void checkMinLengthShouldThrowWhenValueIsNull() {
-        InvalidParameterException exception = assertThrows(
-            InvalidParameterException.class,
-            () -> Validator.checkMinLength(null, 6, "password")
-        );
-
-        assertTrue(exception.getMessage().contains("Field 'password' must have at least 6 characters"));
+    void shouldValidateEmailFormatSuccessfully() {
+        assertDoesNotThrow(() -> {
+            Validator.validateEmailFormat("valid@example.com");
+        });
     }
 
     @Test
@@ -86,23 +59,20 @@ public class ValidatorTest {
         assertDoesNotThrow(() -> Validator.validateEmailFormat("user123+any@subdomain.domain.co"));
         assertDoesNotThrow(() -> Validator.validateEmailFormat("user.name@domain.org"));
     }
-
+    
     @Test
-    void validateEmailFormatShouldThrowForMissingAtSymbol() {
-        InvalidParameterException exception = assertThrows(
-            InvalidParameterException.class,
-            () -> Validator.validateEmailFormat("invalidemail.com")
-        );
+    void shouldThrowExceptionForInvalidEmailFormat() {
+        InvalidParameterException exception = assertThrows(InvalidParameterException.class, () -> {
+            Validator.validateEmailFormat("invalid-email");
+        });
         assertEquals("Invalid email format", exception.getMessage());
     }
 
     @Test
-    void validateEmailFormatShouldThrowForMissingUsername() {
-        InvalidParameterException exception = assertThrows(
-            InvalidParameterException.class,
-            () -> Validator.validateEmailFormat("@example.com")
-        );
-        assertEquals("Invalid email format", exception.getMessage());
+    void shouldValidateMinLengthSuccessfully() {
+        assertDoesNotThrow(() -> {
+            Validator.checkMinLength("ValidName", 3, "name");
+        });
     }
 
     @Test
@@ -130,5 +100,78 @@ public class ValidatorTest {
             () -> Validator.validateEmailFormat("")
         );
         assertEquals("Invalid email format", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenValueBelowMinLength() {
+        InvalidParameterException exception = assertThrows(InvalidParameterException.class, () -> {
+            Validator.checkMinLength("ab", 3, "name");
+        });
+        assertEquals("Field 'name' must have at least 3 characters", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenRequiredMapIsEmpty() {
+        Map<String, Object> fields = new HashMap<>();
+
+        RequiredParameterException exception = assertThrows(RequiredParameterException.class, () -> {
+            Validator.validateRequiredFields(fields);
+        });
+        assertEquals("No fields provided for validation", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenValueIsNullInCheckMinLength() {
+        InvalidParameterException exception = assertThrows(InvalidParameterException.class, () -> {
+            Validator.checkMinLength(null, 3, "name");
+        });
+        assertEquals("Field 'name' must have at least 3 characters", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenRequiredFieldsMapIsNull() {
+        RequiredParameterException exception = assertThrows(RequiredParameterException.class, () -> {
+            Validator.validateRequiredFields(null);
+        });
+        assertEquals("No fields provided for validation", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenRequiredFieldsMapIsEmpty() {
+        Map<String, Object> fields = new HashMap<>();
+
+        RequiredParameterException exception = assertThrows(RequiredParameterException.class, () -> {
+            Validator.validateRequiredFields(fields);
+        });
+        assertEquals("No fields provided for validation", exception.getMessage());
+    }
+
+    @Test
+    void shouldValidateRequiredFieldsSuccessfully() {
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("field1", "value1");
+        fields.put("field2", "value2");
+
+        assertDoesNotThrow(() -> {
+            Validator.validateRequiredFields(fields);
+        });
+    }
+
+    @Test
+    void shouldNotThrowExceptionWhenRequiredFieldIsNonStringObject() {
+        Object nonStringValue = new Object();
+
+        assertDoesNotThrow(() -> {
+            Validator.validateRequiredField("testField", nonStringValue);
+        });
+    }
+
+    @Test
+    void shouldNotThrowExceptionWhenRequiredFieldIsNumber() {
+        Integer numberValue = 42;
+
+        assertDoesNotThrow(() -> {
+            Validator.validateRequiredField("testField", numberValue);
+        });
     }
 }

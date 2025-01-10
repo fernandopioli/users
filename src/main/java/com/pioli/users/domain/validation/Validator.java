@@ -11,19 +11,21 @@ public final class Validator {
 
     private static final Pattern EMAIL_REGEX = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
-    public static void validateRequired(Map<String, Object> fields) {
+
+    public static void validateRequiredFields(Map<String, Object> fields) {
         if (fields == null || fields.isEmpty()) {
             throw new RequiredParameterException("No fields provided for validation");
         }
         for (Map.Entry<String, Object> entry : fields.entrySet()) {
-            String fieldName = entry.getKey();
-            Object value = entry.getValue();
+            validateRequiredField(entry.getKey(), entry.getValue());
+        }
+    }
 
-            if (value == null || (value instanceof String && ((String) value).trim().isEmpty())) {
-                throw new RequiredParameterException(
-                    String.format("Field '%s' has an invalid value: '%s'", fieldName, value)
-                );
-            }
+    public static void validateRequiredField(String fieldName, Object value) {
+        if (value == null || (value instanceof String && ((String) value).trim().isEmpty())) {
+            throw new RequiredParameterException(
+                String.format("Field '%s' is required and cannot be empty", fieldName)
+            );
         }
     }
 

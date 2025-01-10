@@ -12,4 +12,5 @@ import com.pioli.users.infra.persistence.entity.UserEntity;
 public interface SpringDataUserRepository extends JpaRepository<UserEntity, UUID> {
     
     boolean existsByEmail(String email);
+    boolean existsByEmailAndIdNot(String email, UUID id);
 }
