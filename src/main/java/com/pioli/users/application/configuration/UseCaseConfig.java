@@ -9,6 +9,7 @@ import com.pioli.users.application.usecases.CreateUserUseCase;
 import com.pioli.users.application.usecases.DeleteUserUseCase;
 import com.pioli.users.application.usecases.FindUserByIdUseCase;
 import com.pioli.users.application.usecases.UpdateUserUseCase;
+import com.pioli.users.application.usecases.ListAllUsersUseCase;
 
 @Configuration
 public class UseCaseConfig {
@@ -39,5 +40,10 @@ public class UseCaseConfig {
     @Bean
     public DeleteUserUseCase deleteUserUseCase() {
         return new DeleteUserUseCase(userRepository);
+    }
+
+    @Bean
+    public ListAllUsersUseCase listAllUsersUseCase() {
+        return new ListAllUsersUseCase(userRepository);
     }
 }
