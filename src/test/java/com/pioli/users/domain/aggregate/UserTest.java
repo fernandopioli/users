@@ -161,4 +161,26 @@ public class UserTest {
         });
         assertEquals("Field 'password' is required and cannot be empty", exception.getMessage());
     }
+
+    @Test
+    void shouldNotUpdateWhenUserParamsAreNull() {
+        LocalDateTime originalUpdatedAt = user.getUpdatedAt();
+        user.update(null, null, null);
+
+        assertEquals("Original Name", user.getName());
+        assertEquals("original@example.com", user.getEmail());
+        assertEquals("originalPassword", user.getPassword());
+        assertEquals(originalUpdatedAt, user.getUpdatedAt());
+    }
+
+    @Test
+    void shouldNotUpdateUpdatedAtWhenDelete() {
+        User user = User.create("Name", "email@example.com", "password123");
+        LocalDateTime beforeDeleteUpdatedAt = user.getUpdatedAt();
+
+        user.delete();
+
+        assertNotNull(user.getDeletedAt());
+        assertEquals(beforeDeleteUpdatedAt, user.getUpdatedAt());
+    }
 }

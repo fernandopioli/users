@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import com.pioli.users.application.interfaces.PasswordHasher;
 import com.pioli.users.application.interfaces.UserRepository;
 import com.pioli.users.application.usecases.CreateUserUseCase;
+import com.pioli.users.application.usecases.DeleteUserUseCase;
+import com.pioli.users.application.usecases.FindUserByIdUseCase;
 import com.pioli.users.application.usecases.UpdateUserUseCase;
 
 @Configuration
@@ -27,5 +29,15 @@ public class UseCaseConfig {
     @Bean
     public UpdateUserUseCase updateUserUseCase() {
         return new UpdateUserUseCase(userRepository, passwordHasher);
+    }
+
+    @Bean
+    public FindUserByIdUseCase findUserByIdUseCase() {
+        return new FindUserByIdUseCase(userRepository);
+    }
+
+    @Bean
+    public DeleteUserUseCase deleteUserUseCase() {
+        return new DeleteUserUseCase(userRepository);
     }
 }

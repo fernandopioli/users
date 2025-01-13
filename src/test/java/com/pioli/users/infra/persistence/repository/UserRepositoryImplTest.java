@@ -3,6 +3,7 @@ package com.pioli.users.infra.persistence.repository;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -14,7 +15,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import com.pioli.users.application.interfaces.UserRepository;
 import com.pioli.users.domain.aggregate.User;
-import com.pioli.users.infra.persistence.entity.UserEntity;
 import com.pioli.users.infra.persistence.jpa.SpringDataUserRepository;
 
 @DataJpaTest
@@ -36,8 +36,10 @@ class UserRepositoryImplTest {
 
         userRepository.save(user);
 
-        boolean exists = userRepository.existsByEmail("test@mail.com");
-        assertTrue(exists);
+        Optional<User> storedUser = userRepository.findById(user.getId());
+        assertTrue(storedUser.isPresent());
+        assertEquals("Test Name", storedUser.get().getName());
+        assertEquals("test@mail.com", storedUser.get().getEmail());
     }
 
     @Test
@@ -94,5 +96,50 @@ class UserRepositoryImplTest {
         Optional<User> updatedUser = userRepository.findById(user.getId());
         assertTrue(updatedUser.isPresent());
         assertEquals("Updated Name", updatedUser.get().getName());
+    }
+
+    @Test
+    void shouldNotFindDeletedUser() {
+        User user = User.create("Test Name", "test@mail.com", "pass123");
+        userRepository.save(user);
+
+        user.delete();
+        userRepository.save(user);
+
+        Optional<User> storedUser = userRepository.findById(user.getId());
+        assertFalse(storedUser.isPresent());
+    }
+
+    @Test
+    void shouldReturnTrueIfEmailExists() {
+        User user = User.create("Test User", "existing@example.com", "password123");
+        userRepository.save(user);
+
+        boolean exists = userRepository.existsByEmail("existing@example.com");
+        assertTrue(exists);
+    }
+
+    @Test
+    void shouldReturnFalseIfEmailDoesNotExist() {
+        boolean exists = userRepository.existsByEmail("nonexistent@example.com");
+        assertFalse(exists);
+    }
+
+    @Test
+    void shouldSoftDeleteUser() {
+        User user = User.create("User To Delete", "userToDelete@example.com", "password123");
+        userRepository.save(user);
+
+        assertTrue(userRepository.findById(user.getId()).isPresent());
+
+        user.delete();
+
+        userRepository.delete(user);
+
+        assertFalse(userRepository.findById(user.getId()).isPresent());
+
+        var userEntityOptional = springDataUserRepository.findById(user.getId());
+        assertTrue(userEntityOptional.isPresent());
+        assertNotNull(userEntityOptional.get().getDeletedAt());
     }
 }

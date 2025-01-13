@@ -1,8 +1,6 @@
 package com.pioli.users.domain.aggregate;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import com.pioli.users.domain.base.Aggregate;
@@ -38,19 +36,25 @@ public class User extends Aggregate {
     }
 
     public void update(String name, String email, String password) {
+        boolean updated = false;
         if (name != null) {
             validateName(name);
             this.name = name;
+            updated = true;
         }
         if (email != null) {
             validateEmail(email);
             this.email = email;
+            updated = true;
         }
         if (password != null) {
             validatePassword(password);
             this.password = password;
+            updated = true;
         }
-        updateTimestamps();
+        if (updated) {
+            updateTimestamps();
+        }
     }
 
     public void delete() {

@@ -5,8 +5,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -22,6 +24,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pioli.users.application.usecases.CreateUserUseCase;
+import com.pioli.users.application.usecases.DeleteUserUseCase;
+import com.pioli.users.application.usecases.FindUserByIdUseCase;
 import com.pioli.users.application.usecases.UpdateUserUseCase;
 import com.pioli.users.domain.aggregate.User;
 import com.pioli.users.domain.exceptions.AlreadyExistsException;
@@ -41,6 +45,12 @@ public class UserControllerTest {
 
     @MockBean
     private UpdateUserUseCase updateUserUseCase;
+
+    @MockBean
+    private FindUserByIdUseCase findUserByIdUseCase;
+
+    @MockBean
+    private DeleteUserUseCase deleteUserUseCase;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -255,5 +265,60 @@ public class UserControllerTest {
             .andExpect(jsonPath("$.code").value(409))
             .andExpect(jsonPath("$.name").value("ALREADY_EXISTS"))
             .andExpect(jsonPath("$.message").value("Email already exists"));
+    }
+
+    @Test
+    void shouldReturnUserWhenGetById() throws Exception {
+        UUID userId = UUID.randomUUID();
+        User mockUser = User.load(userId, "Test User", "test@example.com", "hashedPassword", null, null, null);
+
+        when(findUserByIdUseCase.execute(userId)).thenReturn(mockUser);
+
+        mockMvc.perform(get("/users/" + userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userId.toString()))
+                .andExpect(jsonPath("$.name").value("Test User"))
+                .andExpect(jsonPath("$.email").value("test@example.com"));
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenUserDoesNotExistOnFindById() throws Exception {
+        UUID userId = UUID.randomUUID();
+
+        when(findUserByIdUseCase.execute(userId)).thenThrow(new ResourceNotFoundException("User not found with id: " + userId));
+
+        mockMvc.perform(get("/users/" + userId))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value(404))
+                .andExpect(jsonPath("$.name").value("RESOURCE_NOT_FOUND"))
+                .andExpect(jsonPath("$.message").value("User not found with id: " + userId));
+    }
+
+    @Test
+    void shouldDeleteUserSuccessfully() throws Exception {
+        UUID userId = UUID.randomUUID();
+
+        doNothing().when(deleteUserUseCase).execute(userId);
+
+        mockMvc.perform(delete("/users/" + userId))
+                .andExpect(status().isNoContent());
+
+        verify(deleteUserUseCase, times(1)).execute(userId);
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenDeletingNonExistingUser() throws Exception {
+        UUID userId = UUID.randomUUID();
+
+        doThrow(new ResourceNotFoundException("User not found with id: " + userId))
+                .when(deleteUserUseCase).execute(userId);
+
+        mockMvc.perform(delete("/users/" + userId))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value(404))
+                .andExpect(jsonPath("$.name").value("RESOURCE_NOT_FOUND"))
+                .andExpect(jsonPath("$.message").value("User not found with id: " + userId));
+
+        verify(deleteUserUseCase, times(1)).execute(userId);
     }
 }

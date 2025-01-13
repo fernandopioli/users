@@ -1,17 +1,19 @@
 package com.pioli.users.presentation.controllers.dtos;
 
+import java.util.UUID;
+
 public class UserResponse {
-    private String id;
+    private UUID id;
     private String name;
     private String email;
 
-    public UserResponse(String id, String name, String email) {
+    public UserResponse(UUID id, String name, String email) {
         this.id = id;
         this.name = name;
         this.email = email;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 

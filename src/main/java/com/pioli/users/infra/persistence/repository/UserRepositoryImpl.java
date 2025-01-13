@@ -28,13 +28,19 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<User> findById(UUID id) {
-        return springDataUserRepository.findById(id)
+        return springDataUserRepository.findByIdAndDeletedAtIsNull(id)
                 .map(this::toDomain);
     }
 
     @Override
     public boolean existsByEmailAndIdNot(String email, UUID id) {
         return springDataUserRepository.existsByEmailAndIdNot(email, id);
+    }
+
+    @Override
+    public void delete(User user) {
+        UserEntity userEntity = toEntity(user);
+        springDataUserRepository.save(userEntity);
     }
 
     private UserEntity toEntity(User user) {
