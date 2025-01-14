@@ -51,7 +51,6 @@ public class UserController {
         User user = findUserByIdUseCase.execute(id);
         UserResponse response = UserResponse.fromDomain(user);
 
-        // Adicionando links HATEOAS
         response.add(linkTo(methodOn(UserController.class).findUserById(id)).withSelfRel());
         response.add(linkTo(methodOn(UserController.class).listAllUsers(0, 10, "name", "asc", null)).withRel("users"));
 

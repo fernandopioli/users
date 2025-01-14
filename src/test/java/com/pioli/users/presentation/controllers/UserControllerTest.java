@@ -1,18 +1,26 @@
 package com.pioli.users.presentation.controllers;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Collections;
+import org.mockito.ArgumentCaptor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,20 +29,28 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pioli.users.application.usecases.CreateUserUseCase;
 import com.pioli.users.application.usecases.DeleteUserUseCase;
 import com.pioli.users.application.usecases.FindUserByIdUseCase;
+import com.pioli.users.application.usecases.ListAllUsersUseCase;
 import com.pioli.users.application.usecases.UpdateUserUseCase;
 import com.pioli.users.domain.aggregate.User;
 import com.pioli.users.domain.exceptions.AlreadyExistsException;
 import com.pioli.users.domain.exceptions.InvalidParameterException;
 import com.pioli.users.domain.exceptions.RequiredParameterException;
 import com.pioli.users.domain.exceptions.ResourceNotFoundException;
+import com.pioli.users.domain.pagination.Page;
+import com.pioli.users.domain.pagination.Pagination;
 import com.pioli.users.presentation.controllers.dtos.UserRequest;
+import com.pioli.users.presentation.configuration.GlobalExceptionHandler;
+import org.springframework.context.annotation.Import;
 
 @WebMvcTest(UserController.class)
+@Import(GlobalExceptionHandler.class)
 public class UserControllerTest {
 
     @Autowired
@@ -51,6 +67,9 @@ public class UserControllerTest {
 
     @MockBean
     private DeleteUserUseCase deleteUserUseCase;
+
+    @MockBean
+    private ListAllUsersUseCase listAllUsersUseCase;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -189,13 +208,14 @@ public class UserControllerTest {
             eq("newPassword")
         )).thenReturn(existingUser);
 
-        mockMvc.perform(put("/users/" + userId)
+        mockMvc.perform(patch("/users/" + userId)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(userId.toString()))
             .andExpect(jsonPath("$.name").value("Existing Name"))
             .andExpect(jsonPath("$.email").value("existing@example.com"));
+            // verify(updateUserUseCase, times(1)).execute(eq(userId), eq("New Name"), eq("newemail@example.com"), eq("newPassword"));
     }
 
     @Test
@@ -212,7 +232,7 @@ public class UserControllerTest {
             anyString()
         )).thenThrow(new ResourceNotFoundException("User not found with id: " + userId));
 
-        mockMvc.perform(put("/users/" + userId)
+        mockMvc.perform(patch("/users/" + userId)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isNotFound())
@@ -235,7 +255,7 @@ public class UserControllerTest {
             eq("123")
         )).thenThrow(new InvalidParameterException("Field 'password' must have at least 6 characters"));
 
-        mockMvc.perform(put("/users/" + userId)
+        mockMvc.perform(patch("/users/" + userId)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
@@ -258,7 +278,7 @@ public class UserControllerTest {
             anyString()
         )).thenThrow(new AlreadyExistsException("Email already exists"));
 
-        mockMvc.perform(put("/users/" + userId)
+        mockMvc.perform(patch("/users/" + userId)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isConflict())
@@ -320,5 +340,108 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.message").value("User not found with id: " + userId));
 
         verify(deleteUserUseCase, times(1)).execute(userId);
+    }
+
+    @Test
+    void shouldReturnBadRequestForInvalidUUID() throws Exception {
+        String invalidUUID = "invalid-uuid";
+
+        mockMvc.perform(get("/users/" + invalidUUID))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.name").value("INVALID_UUID"))
+                .andExpect(jsonPath("$.message").value("The provided ID is not a valid UUID: " + invalidUUID));
+    }
+
+    @Test
+    void shouldListAllUsersSuccessfully() throws Exception {
+        List<User> users = Arrays.asList(
+                User.load(UUID.randomUUID(), "User One", "user1@example.com", "hashedPassword", LocalDateTime.now(), LocalDateTime.now(), null),
+                User.load(UUID.randomUUID(), "User Two", "user2@example.com", "hashedPassword", LocalDateTime.now(), LocalDateTime.now(), null)
+        );
+
+        Page<User> userPage = new Page<>(users, 0, 2, 2, 1);
+
+        when(listAllUsersUseCase.execute(any(Pagination.class))).thenReturn(userPage);
+
+        mockMvc.perform(get("/users"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.users[0].name").value("User One"))
+                .andExpect(jsonPath("$._embedded.users[1].name").value("User Two"));
+
+        verify(listAllUsersUseCase, times(1)).execute(any(Pagination.class));
+    }
+
+    @Test
+    void shouldListUsersWithFiltersSuccessfully() throws Exception {
+        List<User> users = Arrays.asList(
+                User.load(UUID.randomUUID(), "User One", "user1@example.com", "hashedPassword", LocalDateTime.now(), LocalDateTime.now(), null),
+                User.load(UUID.randomUUID(), "User Two", "user2@example.com", "hashedPassword", LocalDateTime.now(), LocalDateTime.now(), null)
+        );
+
+        Page<User> userPage = new Page<>(users, 0, 1, 1, 1);
+
+        when(listAllUsersUseCase.execute(any(Pagination.class))).thenReturn(userPage);
+
+        mockMvc.perform(get("/users")
+                .param("name", "one"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.users[0].name").value("User One"));
+
+        verify(listAllUsersUseCase, times(1)).execute(any(Pagination.class));
+    }
+
+    @Test
+    void shouldApplyOnlyValidFiltersAndIgnoreInvalidOnes() throws Exception {
+        // Arrange
+        UUID userId = UUID.randomUUID();
+        User user = User.load(
+            userId,
+            "Alice",
+            "alice@example.com",
+            "hashedPassword",
+            LocalDateTime.now(),
+            LocalDateTime.now(),
+            null
+        );
+
+        List<User> users = Collections.singletonList(user);
+        Page<User> userPage = new Page<>(users, 0, 10, 1, 1);
+
+        when(listAllUsersUseCase.execute(any(Pagination.class))).thenReturn(userPage);
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("name", "Alice");
+        params.add("age", "30");
+        params.add("email", "alice@example.com");
+        params.add("unknown", "value");
+
+        mockMvc.perform(get("/users").params(params))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.users[0].name").value("Alice"))
+            .andExpect(jsonPath("$._embedded.users[0].email").value("alice@example.com"));
+
+        ArgumentCaptor<Pagination> paginationCaptor = ArgumentCaptor.forClass(Pagination.class);
+        verify(listAllUsersUseCase, times(1)).execute(paginationCaptor.capture());
+
+        Pagination capturedPagination = paginationCaptor.getValue();
+
+        assertTrue(capturedPagination.getFilters().containsKey("name"));
+        assertTrue(capturedPagination.getFilters().containsKey("email"));
+        assertFalse(capturedPagination.getFilters().containsKey("age"));
+        assertFalse(capturedPagination.getFilters().containsKey("unknown"));
+    }
+
+    @Test
+    void whenHttpMethodNotSupported_thenHandleMethodNotSupported() throws Exception {
+        mockMvc.perform(put("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.code").value(405))
+                .andExpect(jsonPath("$.name").value("METHOD_NOT_ALLOWED"))
+                .andExpect(jsonPath("$.message").value(
+                    "The PUT method is not supported for this endpoint. Supported methods are: GET, POST"
+                ));
     }
 }

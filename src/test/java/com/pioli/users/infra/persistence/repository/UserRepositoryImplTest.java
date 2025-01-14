@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import com.pioli.users.application.interfaces.UserRepository;
 import com.pioli.users.domain.aggregate.User;
+import com.pioli.users.domain.pagination.Page;
+import com.pioli.users.domain.pagination.Pagination;
 import com.pioli.users.infra.persistence.jpa.SpringDataUserRepository;
 
 @DataJpaTest
@@ -141,5 +145,41 @@ class UserRepositoryImplTest {
         var userEntityOptional = springDataUserRepository.findById(user.getId());
         assertTrue(userEntityOptional.isPresent());
         assertNotNull(userEntityOptional.get().getDeletedAt());
+    }
+
+    @Test
+    void shouldFindAllUsersWithFilters() {
+        User user1 = User.create("Bob", "bob@example.com", "hashedPassword");
+        User user2 = User.create("Alice", "alice@example.com", "hashedPassword");
+
+        userRepository.save(user1);
+        userRepository.save(user2);
+
+        Map<String, String> filters = new HashMap<>();
+        filters.put("name", "Alice");
+
+        Pagination pagination = new Pagination(0, 10, "name", "asc", filters);
+
+        Page<User> result = userRepository.findAll(pagination);
+
+        assertEquals(1, result.getContent().size());
+        assertEquals("Alice", result.getContent().get(0).getName());
+    }
+
+    @Test
+    void shouldSortUsersInDescendingOrder() {
+        User user1 = User.create("Bob", "bob@example.com", "hashedPassword");
+        User user2 = User.create("Alice", "alice@example.com", "hashedPassword");
+
+        userRepository.save(user1);
+        userRepository.save(user2);
+
+
+        Pagination pagination = new Pagination(0, 10, "name", "desc", new HashMap<>());
+
+        Page<User> result = userRepository.findAll(pagination);
+
+        assertEquals(2, result.getContent().size());
+        assertEquals("Bob", result.getContent().get(0).getName());
     }
 }

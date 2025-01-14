@@ -21,19 +21,7 @@ public class Page<T> {
         return content;
     }
 
-    public int getPage() {
-        return page;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
     public long getTotalElements() {
         return totalElements;
-    }
-
-    public int getTotalPages() {
-        return totalPages;
     }
 } 

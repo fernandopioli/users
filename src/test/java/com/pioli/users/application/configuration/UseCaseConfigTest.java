@@ -11,6 +11,7 @@ import com.pioli.users.application.usecases.CreateUserUseCase;
 import com.pioli.users.application.usecases.DeleteUserUseCase;
 import com.pioli.users.application.usecases.UpdateUserUseCase;
 import com.pioli.users.application.usecases.FindUserByIdUseCase;
+import com.pioli.users.application.usecases.ListAllUsersUseCase;
 
 public class UseCaseConfigTest {
 
@@ -32,5 +33,8 @@ public class UseCaseConfigTest {
 
         DeleteUserUseCase deleteUseCase = config.deleteUserUseCase();
         assertNotNull(deleteUseCase);
+
+        ListAllUsersUseCase listAllUseCase = config.listAllUsersUseCase();
+        assertNotNull(listAllUseCase);
     }
 }

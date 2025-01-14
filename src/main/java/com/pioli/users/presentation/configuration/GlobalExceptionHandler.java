@@ -1,6 +1,5 @@
 package com.pioli.users.presentation.configuration;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -75,12 +74,10 @@ public class GlobalExceptionHandler {
         message.append(e.getMethod());
         message.append(" method is not supported for this endpoint.");
 
-        if (e.getSupportedHttpMethods() != null && !e.getSupportedHttpMethods().isEmpty()) {
             message.append(" Supported methods are: ");
             message.append(String.join(", ", e.getSupportedHttpMethods().stream()
                 .map(method -> method.name())
                 .toArray(String[]::new)));
-        }
 
         ErrorResponse error = new ErrorResponse(
             HttpStatus.METHOD_NOT_ALLOWED.value(),
