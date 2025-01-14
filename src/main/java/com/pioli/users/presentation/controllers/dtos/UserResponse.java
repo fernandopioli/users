@@ -24,7 +24,7 @@ public class UserResponse extends RepresentationModel<UserResponse> {
     }
 
     public static UserResponse fromDomain(User user) {
-        return new UserResponse(user.getId(), user.getName(), user.getEmail(), user.getCreatedAt(), user.getUpdatedAt());
+        return new UserResponse(user.getId(), user.getName().getValue(), user.getEmail().getValue(), user.getCreatedAt(), user.getUpdatedAt());
     }
 
     public UUID getId() {

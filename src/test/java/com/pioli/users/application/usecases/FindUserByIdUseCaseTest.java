@@ -34,7 +34,7 @@ public class FindUserByIdUseCaseTest {
         User result = findUserByIdUseCase.execute(userId);
 
         assertNotNull(result);
-        assertEquals("Test User", result.getName());
+        assertEquals("Test User", result.getName().getValue());
         verify(userRepository, times(1)).findById(userId);
     }
 

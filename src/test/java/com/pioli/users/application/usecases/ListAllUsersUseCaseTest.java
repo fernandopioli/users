@@ -44,8 +44,8 @@ public class ListAllUsersUseCaseTest {
 
         assertNotNull(resultPage);
         assertEquals(2, resultPage.getContent().size());
-        assertEquals("Alice", resultPage.getContent().get(0).getName());
-        assertEquals("Bob", resultPage.getContent().get(1).getName());
+        assertEquals("Alice", resultPage.getContent().get(0).getName().getValue());
+        assertEquals("Bob", resultPage.getContent().get(1).getName().getValue());
         verify(userRepository, times(1)).findAll(pagination);
     }
 
@@ -67,7 +67,7 @@ public class ListAllUsersUseCaseTest {
 
         assertNotNull(resultPage);
         assertEquals(1, resultPage.getContent().size());
-        assertEquals("Alice", resultPage.getContent().get(0).getName());
+        assertEquals("Alice", resultPage.getContent().get(0).getName().getValue());
         verify(userRepository, times(1)).findAll(pagination);
     }
 } 

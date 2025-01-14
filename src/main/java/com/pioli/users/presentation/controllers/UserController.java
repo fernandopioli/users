@@ -121,7 +121,7 @@ public class UserController {
         org.springframework.data.domain.Page<UserResponse> springPage =
             new org.springframework.data.domain.PageImpl<>(
                 userResponses,
-                org.springframework.data.domain.PageRequest.of(page, size),
+                org.springframework.data.domain.PageRequest.of(userPage.getPage(), userPage.getSize()),
                 userPage.getTotalElements()
             );
 

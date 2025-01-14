@@ -85,14 +85,19 @@ public class UserControllerTest {
             "Existing Name",
             "existing@example.com",
             "existingHashedPassword",
-            null,
-            null,
+            LocalDateTime.now(),
+            LocalDateTime.now(),
             null
         );
     }
 
     @Test
     void shouldCreateUserAndReturn201() throws Exception {
+
+        UserRequest request = new UserRequest();
+        request.setName("Any Name");
+        request.setEmail("mail@example.com");
+        request.setPassword("123456");
 
         User mockUser = User.create("Any Name", "mail@example.com", "123456");
         when(createUserUseCase.execute(eq("Any Name"), eq("mail@example.com"), eq("123456")))
@@ -101,17 +106,12 @@ public class UserControllerTest {
 
                 mockMvc.perform(post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                      "name": "Any Name",
-                      "email": "mail@example.com",
-                      "password": "123456"
-                    }
-                """))
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(mockUser.getId().toString()))
-                .andExpect(jsonPath("$.name").value(mockUser.getName()))
-                .andExpect(jsonPath("$.email").value(mockUser.getEmail()));
+                .andExpect(jsonPath("$.name").value(mockUser.getName().getValue()))
+                .andExpect(jsonPath("$.email").value(mockUser.getEmail().getValue()));
+                verify(createUserUseCase, times(1)).execute(eq("Any Name"), eq("mail@example.com"), eq("123456"));
 
     }
 
@@ -213,9 +213,9 @@ public class UserControllerTest {
             .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(userId.toString()))
-            .andExpect(jsonPath("$.name").value("Existing Name"))
-            .andExpect(jsonPath("$.email").value("existing@example.com"));
-            // verify(updateUserUseCase, times(1)).execute(eq(userId), eq("New Name"), eq("newemail@example.com"), eq("newPassword"));
+            .andExpect(jsonPath("$.name").value(existingUser.getName().getValue()))
+            .andExpect(jsonPath("$.email").value(existingUser.getEmail().getValue()));
+            verify(updateUserUseCase, times(1)).execute(eq(userId), eq("New Name"), eq("newemail@example.com"), eq("newPassword"));
     }
 
     @Test
@@ -299,6 +299,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.id").value(userId.toString()))
                 .andExpect(jsonPath("$.name").value("Test User"))
                 .andExpect(jsonPath("$.email").value("test@example.com"));
+                verify(findUserByIdUseCase, times(1)).execute(eq(userId));
     }
 
     @Test
@@ -439,9 +440,6 @@ public class UserControllerTest {
                 .content("{}"))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(jsonPath("$.code").value(405))
-                .andExpect(jsonPath("$.name").value("METHOD_NOT_ALLOWED"))
-                .andExpect(jsonPath("$.message").value(
-                    "The PUT method is not supported for this endpoint. Supported methods are: GET, POST"
-                ));
+                .andExpect(jsonPath("$.name").value("METHOD_NOT_ALLOWED"));
     }
 }

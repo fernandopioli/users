@@ -57,9 +57,9 @@ public class UpdateUserUseCaseTest {
         );
 
         assertNotNull(updatedUser);
-        assertEquals("New Name", updatedUser.getName());
-        assertEquals("newemail@example.com", updatedUser.getEmail());
-        assertEquals("newHashedPassword", updatedUser.getPassword());
+        assertEquals("New Name", updatedUser.getName().getValue());
+        assertEquals("newemail@example.com", updatedUser.getEmail().getValue());
+        assertEquals("newHashedPassword", updatedUser.getPassword().getValue());
 
         verify(userRepository, times(1)).save(updatedUser);
     }
@@ -95,9 +95,9 @@ public class UpdateUserUseCaseTest {
 
         User updatedUser = updateUserUseCase.execute(userId, "New Name", null, null);
 
-        assertEquals("New Name", updatedUser.getName());
-        assertEquals("existing@example.com", updatedUser.getEmail());
-        assertEquals("existingHashedPassword", updatedUser.getPassword());
+        assertEquals("New Name", updatedUser.getName().getValue());
+        assertEquals("existing@example.com", updatedUser.getEmail().getValue());
+        assertEquals("existingHashedPassword", updatedUser.getPassword().getValue());
 
         verify(userRepository, times(1)).save(updatedUser);
     }

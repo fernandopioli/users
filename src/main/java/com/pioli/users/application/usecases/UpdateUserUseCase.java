@@ -8,6 +8,7 @@ import com.pioli.users.application.interfaces.UserRepository;
 import com.pioli.users.domain.aggregate.User;
 import com.pioli.users.domain.exceptions.AlreadyExistsException;
 import com.pioli.users.domain.exceptions.ResourceNotFoundException;
+import com.pioli.users.domain.valueobject.Password;
 
 public class UpdateUserUseCase {
     private final UserRepository userRepository;
@@ -32,7 +33,7 @@ public class UpdateUserUseCase {
 
         String hashedPassword = null;
         if (password != null) {
-            User.validatePassword(password);
+            Password.validatePassword(password);
             hashedPassword = passwordHasher.hash(password);
         }
 

@@ -4,6 +4,7 @@ import com.pioli.users.application.interfaces.PasswordHasher;
 import com.pioli.users.application.interfaces.UserRepository;
 import com.pioli.users.domain.aggregate.User;
 import com.pioli.users.domain.exceptions.AlreadyExistsException;
+import com.pioli.users.domain.valueobject.Password;
 
 public class CreateUserUseCase {
     private final UserRepository userRepository;
@@ -19,7 +20,7 @@ public class CreateUserUseCase {
             throw new AlreadyExistsException("Email already exists");
         }
 
-        User.validatePassword(password);
+        Password.validatePassword(password);
 
         String hashedPassword = passwordHasher.hash(password);
 

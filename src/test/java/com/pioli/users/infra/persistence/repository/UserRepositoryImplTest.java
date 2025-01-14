@@ -42,8 +42,8 @@ class UserRepositoryImplTest {
 
         Optional<User> storedUser = userRepository.findById(user.getId());
         assertTrue(storedUser.isPresent());
-        assertEquals("Test Name", storedUser.get().getName());
-        assertEquals("test@mail.com", storedUser.get().getEmail());
+        assertEquals("Test Name", storedUser.get().getName().getValue());
+        assertEquals("test@mail.com", storedUser.get().getEmail().getValue());
     }
 
     @Test
@@ -53,7 +53,7 @@ class UserRepositoryImplTest {
 
         Optional<User> foundUser = userRepository.findById(user.getId());
         assertTrue(foundUser.isPresent());
-        assertEquals("Test User", foundUser.get().getName());
+        assertEquals("Test User", foundUser.get().getName().getValue());
     }
 
     @Test
@@ -99,7 +99,7 @@ class UserRepositoryImplTest {
 
         Optional<User> updatedUser = userRepository.findById(user.getId());
         assertTrue(updatedUser.isPresent());
-        assertEquals("Updated Name", updatedUser.get().getName());
+        assertEquals("Updated Name", updatedUser.get().getName().getValue());
     }
 
     @Test
@@ -163,7 +163,7 @@ class UserRepositoryImplTest {
         Page<User> result = userRepository.findAll(pagination);
 
         assertEquals(1, result.getContent().size());
-        assertEquals("Alice", result.getContent().get(0).getName());
+        assertEquals("Alice", result.getContent().get(0).getName().getValue());
     }
 
     @Test
@@ -180,6 +180,6 @@ class UserRepositoryImplTest {
         Page<User> result = userRepository.findAll(pagination);
 
         assertEquals(2, result.getContent().size());
-        assertEquals("Bob", result.getContent().get(0).getName());
+        assertEquals("Bob", result.getContent().get(0).getName().getValue());
     }
 }

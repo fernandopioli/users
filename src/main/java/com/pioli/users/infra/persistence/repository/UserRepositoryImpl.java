@@ -94,9 +94,9 @@ public class UserRepositoryImpl implements UserRepository {
     private UserEntity toEntity(User user) {
         return new UserEntity(
                 user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getPassword(),
+                user.getName().getValue(),
+                user.getEmail().getValue(),
+                user.getPassword().getValue(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
                 user.getDeletedAt()

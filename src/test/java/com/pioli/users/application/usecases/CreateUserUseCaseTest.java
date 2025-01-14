@@ -40,9 +40,9 @@ public class CreateUserUseCaseTest {
         User createdUser = createUserUseCase.execute(name, email, password);
 
         assertNotNull(createdUser);
-        assertEquals(name, createdUser.getName());
-        assertEquals(email, createdUser.getEmail());
-        assertEquals("hashedPassword", createdUser.getPassword());
+        assertEquals(name, createdUser.getName().getValue());
+        assertEquals(email, createdUser.getEmail().getValue());
+        assertEquals("hashedPassword", createdUser.getPassword().getValue());
         verify(passwordHasher, times(1)).hash("anyPassword");
         verify(userRepository, times(1)).save(any(User.class));
     }
