@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import com.pioli.users.application.interfaces.PasswordHasher;
 import com.pioli.users.application.interfaces.UserRepository;
 import com.pioli.users.domain.aggregate.User;
+import com.pioli.users.domain.events.DomainEventPublisher;
 import com.pioli.users.domain.exceptions.AlreadyExistsException;
 import com.pioli.users.domain.exceptions.InvalidParameterException;
 
@@ -20,12 +21,14 @@ public class CreateUserUseCaseTest {
     private CreateUserUseCase createUserUseCase;
     private UserRepository userRepository;
     private PasswordHasher passwordHasher;
+    private DomainEventPublisher domainEventPublisher;
 
     @BeforeEach
     void setUp() {
         userRepository = mock(UserRepository.class);
         passwordHasher = mock(PasswordHasher.class);
-        createUserUseCase = new CreateUserUseCase(userRepository, passwordHasher);
+        domainEventPublisher = mock(DomainEventPublisher.class);
+        createUserUseCase = new CreateUserUseCase(userRepository, passwordHasher, domainEventPublisher);
     }
 
     @Test

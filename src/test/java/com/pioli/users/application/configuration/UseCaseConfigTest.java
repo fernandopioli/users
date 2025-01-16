@@ -10,6 +10,7 @@ import com.pioli.users.application.interfaces.UserRepository;
 import com.pioli.users.application.usecases.CreateUserUseCase;
 import com.pioli.users.application.usecases.DeleteUserUseCase;
 import com.pioli.users.application.usecases.UpdateUserUseCase;
+import com.pioli.users.domain.events.DomainEventPublisher;
 import com.pioli.users.application.usecases.FindUserByIdUseCase;
 import com.pioli.users.application.usecases.ListAllUsersUseCase;
 
@@ -19,10 +20,11 @@ public class UseCaseConfigTest {
     void shouldCreateCreateUserUseCase() {
         UserRepository mockRepo = mock(UserRepository.class);
         PasswordHasher mockHash = mock(PasswordHasher.class);
+        DomainEventPublisher mockPublisher = mock(DomainEventPublisher.class);
 
-        UseCaseConfig config = new UseCaseConfig(mockRepo, mockHash);
+        UseCaseConfig config = new UseCaseConfig(mockRepo, mockHash, mockPublisher);
 
-        CreateUserUseCase createUseCase = config.createUserUseCase();
+        CreateUserUseCase createUseCase = config.createUserUseCase(mockRepo, mockHash, mockPublisher);
         assertNotNull(createUseCase);
 
         UpdateUserUseCase updateUseCase = config.updateUserUseCase();

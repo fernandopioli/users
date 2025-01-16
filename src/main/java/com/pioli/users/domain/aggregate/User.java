@@ -1,6 +1,7 @@
 package com.pioli.users.domain.aggregate;
 
 import com.pioli.users.domain.base.Aggregate;
+import com.pioli.users.domain.events.UserCreatedEvent;
 import com.pioli.users.domain.valueobject.Email;
 import com.pioli.users.domain.valueobject.Name;
 import com.pioli.users.domain.valueobject.Password;
@@ -12,6 +13,7 @@ public class User extends Aggregate {
     private Name name;
     private Email email;
     private Password password;
+
 
     private User(UUID id, Name name, Email email, Password password, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt) {
         super(id, createdAt, updatedAt, deletedAt);
@@ -31,7 +33,9 @@ public class User extends Aggregate {
         Name nameObj = Name.of(name);
         Email emailObj = Email.of(email);
         Password passwordObj = Password.of(password);
-        return new User(nameObj, emailObj, passwordObj);
+        User user = new User(nameObj, emailObj, passwordObj);
+        user.recordEvent(new UserCreatedEvent(user));
+        return user;
     }
 
     public static User load(UUID id, String name, String email, String password,

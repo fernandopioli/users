@@ -20,6 +20,22 @@ spring:
   web:
     resources:
       add-mappings: false
+  kafka:
+    bootstrap-servers: localhost:19092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: com.pioli.users.infra.messaging.configuration.DomainEventSerializer
+      properties:
+        spring.json.add.type.headers: false
+    topic:
+      user-created: user-events
 server:
   servlet:
     context-path: /v1
+logging:
+  level:
+    root: ERROR
+    # org.apache.kafka: DEBUG
+    # org.springframework.kafka: DEBUG
+    # org.springframework.kafka.support.serializer: TRACE
+    # com.pioli.users.infra.messaging: TRACE
