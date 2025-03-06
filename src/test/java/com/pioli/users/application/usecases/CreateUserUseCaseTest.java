@@ -9,10 +9,10 @@ import static org.mockito.Mockito.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.pioli.users.application.interfaces.DomainEventPublisher;
 import com.pioli.users.application.interfaces.PasswordHasher;
 import com.pioli.users.application.interfaces.UserRepository;
 import com.pioli.users.domain.aggregate.User;
-import com.pioli.users.domain.events.DomainEventPublisher;
 import com.pioli.users.domain.exceptions.AlreadyExistsException;
 import com.pioli.users.domain.exceptions.InvalidParameterException;
 

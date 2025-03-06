@@ -1,12 +1,12 @@
 package com.pioli.users.application.usecases;
 
+import com.pioli.users.application.interfaces.DomainEventPublisher;
 import com.pioli.users.application.interfaces.PasswordHasher;
 import com.pioli.users.application.interfaces.UserRepository;
 import com.pioli.users.domain.aggregate.User;
 import com.pioli.users.domain.exceptions.AlreadyExistsException;
 import com.pioli.users.domain.valueobject.Password;
 import com.pioli.users.domain.events.DomainEvent;
-import com.pioli.users.domain.events.DomainEventPublisher;
 
 public class CreateUserUseCase {
     private final UserRepository userRepository;

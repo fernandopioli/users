@@ -3,8 +3,8 @@ package com.pioli.users.infra.messaging.configuration;
 
 import org.springframework.scheduling.annotation.Async;
 
+import com.pioli.users.application.interfaces.DomainEventPublisher;
 import com.pioli.users.domain.events.DomainEvent;
-import com.pioli.users.domain.events.DomainEventPublisher;
 
 public class AsyncDomainEventPublisher implements DomainEventPublisher {
 

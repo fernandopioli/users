@@ -1,4 +1,4 @@
-package com.pioli.users.infra.persistence;
+package com.pioli.users.infra.persistence.configuration;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -11,9 +11,9 @@ import org.springframework.context.annotation.Import;
 import com.pioli.users.application.interfaces.UserRepository;
 import com.pioli.users.infra.persistence.repository.UserRepositoryImpl;
 
-@Import(RepositoriesConfiguration.class)
+@Import(RepositoriesConfig.class)
 @DataJpaTest
-class RepositoriesConfigurationTest {
+class RepositoriesConfigTest {
 
     @Autowired
     private UserRepository userRepository;

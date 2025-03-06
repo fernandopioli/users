@@ -5,12 +5,12 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.Test;
 
+import com.pioli.users.application.interfaces.DomainEventPublisher;
 import com.pioli.users.application.interfaces.PasswordHasher;
 import com.pioli.users.application.interfaces.UserRepository;
 import com.pioli.users.application.usecases.CreateUserUseCase;
 import com.pioli.users.application.usecases.DeleteUserUseCase;
 import com.pioli.users.application.usecases.UpdateUserUseCase;
-import com.pioli.users.domain.events.DomainEventPublisher;
 import com.pioli.users.application.usecases.FindUserByIdUseCase;
 import com.pioli.users.application.usecases.ListAllUsersUseCase;
 
