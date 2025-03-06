@@ -28,7 +28,7 @@ spring:
       properties:
         spring.json.add.type.headers: false
     topic:
-      user-created: user-events
+      user-created: users
       orders: orders
 server:
   servlet:
