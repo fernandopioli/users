@@ -1,4 +1,4 @@
-package com.pioli.users.presentation.configuration;
+package com.pioli.users.presentation.dtos;
 
 public class ErrorResponse {
     private Integer code;

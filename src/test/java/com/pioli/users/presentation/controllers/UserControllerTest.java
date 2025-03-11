@@ -38,6 +38,7 @@ import com.pioli.users.application.usecases.DeleteUserUseCase;
 import com.pioli.users.application.usecases.FindUserByIdUseCase;
 import com.pioli.users.application.usecases.ListAllUsersUseCase;
 import com.pioli.users.application.usecases.UpdateUserUseCase;
+import com.pioli.users.config.GlobalExceptionHandler;
 import com.pioli.users.domain.aggregate.User;
 import com.pioli.users.domain.exceptions.AlreadyExistsException;
 import com.pioli.users.domain.exceptions.InvalidParameterException;
@@ -45,8 +46,8 @@ import com.pioli.users.domain.exceptions.RequiredParameterException;
 import com.pioli.users.domain.exceptions.ResourceNotFoundException;
 import com.pioli.users.domain.pagination.Page;
 import com.pioli.users.domain.pagination.Pagination;
-import com.pioli.users.presentation.controllers.dtos.UserRequest;
-import com.pioli.users.presentation.configuration.GlobalExceptionHandler;
+import com.pioli.users.presentation.dtos.UserRequest;
+
 import org.springframework.context.annotation.Import;
 
 @WebMvcTest(UserController.class)

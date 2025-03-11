@@ -29,7 +29,6 @@ spring:
         spring.json.add.type.headers: false
     topic:
       user-created: users
-      orders: orders
 server:
   servlet:
     context-path: /v1

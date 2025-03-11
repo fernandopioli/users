@@ -1,4 +1,4 @@
-package com.pioli.users.presentation.configuration;
+package com.pioli.users.config;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,22 +15,16 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.pioli.users.domain.exceptions.AlreadyExistsException;
-import com.pioli.users.domain.exceptions.InvalidParameterException;
-import com.pioli.users.domain.exceptions.RequiredParameterException;
 import com.pioli.users.domain.exceptions.ResourceNotFoundException;
+import com.pioli.users.domain.exceptions.ValidationException;
+import com.pioli.users.presentation.dtos.ErrorResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(RequiredParameterException.class)
-    public ResponseEntity<ErrorResponse> handleRequiredParameter(RequiredParameterException e) {
-        ErrorResponse error = new ErrorResponse(400, "REQUIRED_PARAM", e.getMessage());
-        return ResponseEntity.badRequest().body(error);
-    }
-
-    @ExceptionHandler(InvalidParameterException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidParameter(InvalidParameterException e) {
-        ErrorResponse error = new ErrorResponse(400,"INVALID_PARAM", e.getMessage());
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(ValidationException e) {
+        ErrorResponse error = new ErrorResponse(400, "VALIDATION_ERROR", e.getMessage());
         return ResponseEntity.badRequest().body(error);
     }
 

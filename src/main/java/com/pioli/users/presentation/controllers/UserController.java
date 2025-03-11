@@ -8,8 +8,8 @@ import com.pioli.users.application.usecases.*;
 import com.pioli.users.domain.aggregate.User;
 import com.pioli.users.domain.pagination.Page;
 import com.pioli.users.domain.pagination.Pagination;
-import com.pioli.users.presentation.controllers.dtos.UserRequest;
-import com.pioli.users.presentation.controllers.dtos.UserResponse;
+import com.pioli.users.presentation.dtos.UserRequest;
+import com.pioli.users.presentation.dtos.UserResponse;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import com.pioli.users.application.interfaces.PasswordHasher;
+import com.pioli.users.config.SecurityConfig;
 
 public class SecurityConfigTest {
     @Test

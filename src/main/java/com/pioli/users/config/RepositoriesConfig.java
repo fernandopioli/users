@@ -1,4 +1,4 @@
-package com.pioli.users.infra.persistence.configuration;
+package com.pioli.users.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

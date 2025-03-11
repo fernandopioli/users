@@ -1,4 +1,4 @@
-package com.pioli.users.presentation.controllers.dtos;
+package com.pioli.users.presentation.dtos;
 
 import com.pioli.users.domain.aggregate.User;
 import org.springframework.hateoas.RepresentationModel;

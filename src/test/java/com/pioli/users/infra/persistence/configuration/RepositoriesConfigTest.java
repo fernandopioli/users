@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import com.pioli.users.application.interfaces.UserRepository;
+import com.pioli.users.config.RepositoriesConfig;
 import com.pioli.users.infra.persistence.repository.UserRepositoryImpl;
 
 @Import(RepositoriesConfig.class)

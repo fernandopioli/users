@@ -1,8 +1,10 @@
-package com.pioli.users.infra.messaging.configuration;
+package com.pioli.users.config;
 
 import com.pioli.users.application.interfaces.DomainEventPublisher;
 import com.pioli.users.domain.events.DomainEvent;
 import com.pioli.users.infra.messaging.KafkaDomainEventPublisher;
+import com.pioli.users.infra.messaging.configuration.AsyncDomainEventPublisher;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

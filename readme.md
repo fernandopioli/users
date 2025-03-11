@@ -67,3 +67,21 @@ target/site/jacoco/index.html
 - JaCoCo (test coverage reporting)
 
 *Specific version numbers will be updated or adjusted as development continues.*
+
+
+----
+COMMENTS:
+- Dominio e application isolados de framework
+- pasta config configurando o framework
+- Pricipios do DDD como value object, aggregate root, entity, domain event com classes bases
+- Validatations no domain
+- Exceptions personalizadas
+- Inversao de dependencias com interfaces para isolar o dominio (usecases) de libs externas
+- Disparando Eventos na criacao de usuarios
+- Paginacao personalizada
+- spring configurations and annotations on the config and presentation layer
+TODO:
+- Criar uma interface para usecases
+- Falar que poderia ter um tratamento de erro mais robusto devolvendo todos os erros de uma vez só
+- Criar exceptions de required e missed mais detalhadas
+- Ter uma classe de uniqueUUID

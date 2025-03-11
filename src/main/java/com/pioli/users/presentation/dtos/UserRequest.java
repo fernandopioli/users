@@ -1,4 +1,4 @@
-package com.pioli.users.presentation.controllers.dtos;
+package com.pioli.users.presentation.dtos;
 
 public class UserRequest {
     private String name;

@@ -6,7 +6,6 @@ import com.pioli.users.application.interfaces.UserRepository;
 import com.pioli.users.domain.aggregate.User;
 import com.pioli.users.domain.exceptions.AlreadyExistsException;
 import com.pioli.users.domain.valueobject.Password;
-import com.pioli.users.domain.events.DomainEvent;
 
 public class CreateUserUseCase {
     private final UserRepository userRepository;

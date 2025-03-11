@@ -11,6 +11,7 @@ import com.pioli.users.application.interfaces.UserRepository;
 import com.pioli.users.application.usecases.CreateUserUseCase;
 import com.pioli.users.application.usecases.DeleteUserUseCase;
 import com.pioli.users.application.usecases.UpdateUserUseCase;
+import com.pioli.users.config.UseCaseConfig;
 import com.pioli.users.application.usecases.FindUserByIdUseCase;
 import com.pioli.users.application.usecases.ListAllUsersUseCase;
 

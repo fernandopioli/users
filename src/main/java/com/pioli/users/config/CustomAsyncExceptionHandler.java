@@ -1,4 +1,4 @@
-package com.pioli.users.infra.configuration;
+package com.pioli.users.config;
 
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 

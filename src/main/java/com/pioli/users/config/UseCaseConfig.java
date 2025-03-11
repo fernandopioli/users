@@ -1,4 +1,4 @@
-package com.pioli.users.application.configuration;
+package com.pioli.users.config;
 
 import com.pioli.users.application.interfaces.DomainEventPublisher;
 import com.pioli.users.application.interfaces.PasswordHasher;
@@ -16,6 +16,7 @@ public class UseCaseConfig {
 
     private final UserRepository userRepository;
     private final PasswordHasher passwordHasher;
+    @SuppressWarnings("unused")
     private final DomainEventPublisher domainEventPublisher;
 
     public UseCaseConfig(UserRepository userRepository, PasswordHasher passwordHasher, DomainEventPublisher domainEventPublisher) {
