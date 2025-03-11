@@ -1,7 +1,7 @@
 package com.pioli.users.domain.valueobject;
 
-import com.pioli.users.domain.exceptions.InvalidParameterException;
-import com.pioli.users.domain.exceptions.RequiredParameterException;
+import com.pioli.users.domain.exceptions.ValidationException;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,7 +15,7 @@ public class NameTest {
 
     @Test
     void shouldThrowExceptionForNullName() {
-        Exception exception = assertThrows(RequiredParameterException.class, () -> {
+        Exception exception = assertThrows(ValidationException.class, () -> {
             Name.of(null);
         });
         assertEquals("Field 'name' is required and cannot be empty", exception.getMessage());
@@ -23,7 +23,7 @@ public class NameTest {
 
     @Test
     void shouldThrowExceptionForShortName() {
-        Exception exception = assertThrows(InvalidParameterException.class, () -> {
+        Exception exception = assertThrows(ValidationException.class, () -> {
             Name.of("ab");
         });
         assertEquals("Field 'name' must have at least 3 characters", exception.getMessage());
@@ -38,4 +38,4 @@ public class NameTest {
         assertEquals(name1, name2);
         assertNotEquals(name1, name3);
     }
-} 
+}

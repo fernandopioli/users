@@ -8,7 +8,7 @@ import com.pioli.users.application.interfaces.PasswordHasher;
 import com.pioli.users.application.interfaces.UserRepository;
 import com.pioli.users.domain.aggregate.User;
 import com.pioli.users.domain.exceptions.AlreadyExistsException;
-import com.pioli.users.domain.exceptions.InvalidParameterException;
+import com.pioli.users.domain.exceptions.ValidationException;
 import com.pioli.users.domain.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,14 +33,13 @@ public class UpdateUserUseCaseTest {
 
         userId = UUID.randomUUID();
         existingUser = User.load(
-            userId,
-            "Existing Name",
-            "existing@example.com",
-            "existingHashedPassword",
-            null,
-            null,
-            null
-        );
+                userId,
+                "Existing Name",
+                "existing@example.com",
+                "existingHashedPassword",
+                null,
+                null,
+                null);
     }
 
     @Test
@@ -50,11 +49,10 @@ public class UpdateUserUseCaseTest {
         when(passwordHasher.hash("newPassword")).thenReturn("newHashedPassword");
 
         User updatedUser = updateUserUseCase.execute(
-            userId,
-            "New Name",
-            "newemail@example.com",
-            "newPassword"
-        );
+                userId,
+                "New Name",
+                "newemail@example.com",
+                "newPassword");
 
         assertNotNull(updatedUser);
         assertEquals("New Name", updatedUser.getName().getValue());
@@ -106,7 +104,7 @@ public class UpdateUserUseCaseTest {
     void shouldValidatePasswordBeforeHashing() {
         when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
 
-        InvalidParameterException exception = assertThrows(InvalidParameterException.class, () -> {
+        ValidationException exception = assertThrows(ValidationException.class, () -> {
             updateUserUseCase.execute(userId, null, null, "123");
         });
 
@@ -114,4 +112,4 @@ public class UpdateUserUseCaseTest {
         verify(passwordHasher, never()).hash(anyString());
         verify(userRepository, never()).save(any(User.class));
     }
-} 
+}

@@ -1,8 +1,9 @@
 package com.pioli.users.domain.valueobject;
 
-import com.pioli.users.domain.exceptions.InvalidParameterException;
-import com.pioli.users.domain.exceptions.RequiredParameterException;
 import org.junit.jupiter.api.Test;
+
+import com.pioli.users.domain.exceptions.ValidationException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class EmailTest {
@@ -15,7 +16,7 @@ public class EmailTest {
 
     @Test
     void shouldThrowExceptionForNullEmail() {
-        Exception exception = assertThrows(RequiredParameterException.class, () -> {
+        Exception exception = assertThrows(ValidationException.class, () -> {
             Email.of(null);
         });
         assertEquals("Field 'email' is required and cannot be empty", exception.getMessage());
@@ -23,7 +24,7 @@ public class EmailTest {
 
     @Test
     void shouldThrowExceptionForInvalidEmail() {
-        Exception exception = assertThrows(InvalidParameterException.class, () -> {
+        Exception exception = assertThrows(ValidationException.class, () -> {
             Email.of("invalid-email");
         });
         assertEquals("Invalid email format", exception.getMessage());
@@ -38,4 +39,4 @@ public class EmailTest {
         assertEquals(email1, email2);
         assertNotEquals(email1, email3);
     }
-} 
+}

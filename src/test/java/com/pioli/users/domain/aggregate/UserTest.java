@@ -27,30 +27,6 @@ public class UserTest {
         assertEquals("originalPassword", user.getPassword().getValue());
     }
 
-    // @Test
-    // void shouldThrowExceptionWhenNameIsInvalid() {
-    //     Exception exception = assertThrows(InvalidParameterException.class, () -> {
-    //         User.create("ab", "valid@example.com", "validPassword");
-    //     });
-    //     assertEquals("Field 'name' must have at least 3 characters", exception.getMessage());
-    // }
-
-    // @Test
-    // void shouldThrowExceptionWhenEmailIsInvalid() {
-    //     Exception exception = assertThrows(InvalidParameterException.class, () -> {
-    //         User.create("Valid Name", "invalid-email", "validPassword");
-    //     });
-    //     assertEquals("Invalid email format", exception.getMessage());
-    // }
-
-    // @Test
-    // void shouldThrowExceptionWhenPasswordIsInvalid() {
-    //     Exception exception = assertThrows(InvalidParameterException.class, () -> {
-    //         User.create("Valid Name", "valid@example.com", "123");
-    //     });
-    //     assertEquals("Field 'password' must have at least 6 characters", exception.getMessage());
-    // }
-
     @Test
     void shouldUpdateOnlyProvidedFields() {
         user.update("Updated Name", null, null);
@@ -59,24 +35,6 @@ public class UserTest {
         assertEquals("original@example.com", user.getEmail().getValue());
         assertEquals("originalPassword", user.getPassword().getValue());
     }
-
-    // @Test
-    // void shouldValidateFieldsWhenUpdating() {
-    //     Exception exception = assertThrows(InvalidParameterException.class, () -> {
-    //         user.update("ab", null, null);
-    //     });
-    //     assertEquals("Field 'name' must have at least 3 characters", exception.getMessage());
-
-    //     exception = assertThrows(InvalidParameterException.class, () -> {
-    //         user.update("Valid Name", "invalid-email", null);
-    //     });
-    //     assertEquals("Invalid email format", exception.getMessage());
-
-    //     exception = assertThrows(InvalidParameterException.class, () -> {
-    //         user.update("Valid Name", "valid@example.com", "123");
-    //     });
-    //     assertEquals("Field 'password' must have at least 6 characters", exception.getMessage());
-    // }
 
     @Test
     void shouldDeleteUserSuccessfully() {
@@ -94,14 +52,13 @@ public class UserTest {
         LocalDateTime deletedAt = null;
 
         User loadedUser = User.load(
-            id,
-            "Loaded Name",
-            "loaded@example.com",
-            "loadedPassword",
-            createdAt,
-            updatedAt,
-            deletedAt
-        );
+                id,
+                "Loaded Name",
+                "loaded@example.com",
+                "loadedPassword",
+                createdAt,
+                updatedAt,
+                deletedAt);
 
         assertEquals(id, loadedUser.getId());
         assertEquals("Loaded Name", loadedUser.getName().getValue());
@@ -111,54 +68,6 @@ public class UserTest {
         assertEquals(updatedAt, loadedUser.getUpdatedAt());
         assertNull(loadedUser.getDeletedAt());
     }
-
-    // @Test
-    // void shouldThrowExceptionWhenNameIsNull() {
-    //     Exception exception = assertThrows(RequiredParameterException.class, () -> {
-    //         User.create(null, "valid@example.com", "validPassword");
-    //     });
-    //     assertEquals("Field 'name' is required and cannot be empty", exception.getMessage());
-    // }
-
-    // @Test
-    // void shouldThrowExceptionWhenEmailIsNull() {
-    //     Exception exception = assertThrows(RequiredParameterException.class, () -> {
-    //         User.create("Valid Name", null, "validPassword");
-    //     });
-    //     assertEquals("Field 'email' is required and cannot be empty", exception.getMessage());
-    // }
-
-    // @Test
-    // void shouldThrowExceptionWhenPasswordIsNull() {
-    //     Exception exception = assertThrows(RequiredParameterException.class, () -> {
-    //         User.create("Valid Name", "valid@example.com", null);
-    //     });
-    //     assertEquals("Field 'password' is required and cannot be empty", exception.getMessage());
-    // }
-
-    // @Test
-    // void shouldThrowExceptionWhenUpdatingWithEmptyName() {
-    //     Exception exception = assertThrows(RequiredParameterException.class, () -> {
-    //         user.update("", null, null);
-    //     });
-    //     assertEquals("Field 'name' is required and cannot be empty", exception.getMessage());
-    // }
-
-    // @Test
-    // void shouldThrowExceptionWhenUpdatingWithEmptyEmail() {
-    //     Exception exception = assertThrows(RequiredParameterException.class, () -> {
-    //         user.update(null, "", null);
-    //     });
-    //     assertEquals("Field 'email' is required and cannot be empty", exception.getMessage());
-    // }
-
-    // @Test
-    // void shouldThrowExceptionWhenUpdatingWithEmptyPassword() {
-    //     Exception exception = assertThrows(RequiredParameterException.class, () -> {
-    //         user.update(null, null, "");
-    //     });
-    //     assertEquals("Field 'password' is required and cannot be empty", exception.getMessage());
-    // }
 
     @Test
     void shouldNotUpdateWhenUserParamsAreNull() {
@@ -180,5 +89,28 @@ public class UserTest {
 
         assertNotNull(user.getDeletedAt());
         assertEquals(beforeDeleteUpdatedAt, user.getUpdatedAt());
+    }
+
+    @Test
+    void shouldLoadUserWithNullPassword() {
+        UUID id = UUID.randomUUID();
+        LocalDateTime createdAt = LocalDateTime.now().minusDays(1);
+        LocalDateTime updatedAt = LocalDateTime.now();
+
+        User loadedUser = User.load(
+                id,
+                "Test Name",
+                "test@example.com",
+                null, // Null password
+                createdAt,
+                updatedAt,
+                null);
+
+        assertEquals(id, loadedUser.getId());
+        assertEquals("Test Name", loadedUser.getName().getValue());
+        assertEquals("test@example.com", loadedUser.getEmail().getValue());
+        assertNull(loadedUser.getPassword()); // Password should be null
+        assertEquals(createdAt, loadedUser.getCreatedAt());
+        assertEquals(updatedAt, loadedUser.getUpdatedAt());
     }
 }

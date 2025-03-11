@@ -1,4 +1,4 @@
-package com.pioli.users.test;
+package com.pioli.users.infra.serialization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -8,9 +8,6 @@ import com.pioli.users.domain.events.UserCreatedEvent;
 import com.pioli.users.domain.valueobject.Email;
 import com.pioli.users.domain.valueobject.Name;
 import com.pioli.users.domain.valueobject.Password;
-import com.pioli.users.infra.serialization.EmailMixin;
-import com.pioli.users.infra.serialization.NameMixin;
-import com.pioli.users.infra.serialization.UserMixin;
 
 public class SerializationTest {
 
@@ -32,4 +29,4 @@ public class SerializationTest {
         String json = objectMapper.writeValueAsString(event);
         System.out.println("JSON Output: " + json);
     }
-} 
+}

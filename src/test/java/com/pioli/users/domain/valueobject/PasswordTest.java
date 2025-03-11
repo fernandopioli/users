@@ -1,7 +1,6 @@
 package com.pioli.users.domain.valueobject;
 
-import com.pioli.users.domain.exceptions.InvalidParameterException;
-import com.pioli.users.domain.exceptions.RequiredParameterException;
+import com.pioli.users.domain.exceptions.ValidationException;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,7 +14,7 @@ public class PasswordTest {
 
     @Test
     void shouldThrowExceptionForNullPassword() {
-        Exception exception = assertThrows(RequiredParameterException.class, () -> {
+        Exception exception = assertThrows(ValidationException.class, () -> {
             Password.of(null);
         });
         assertEquals("Field 'password' is required and cannot be empty", exception.getMessage());
@@ -23,7 +22,7 @@ public class PasswordTest {
 
     @Test
     void shouldThrowExceptionForShortPassword() {
-        Exception exception = assertThrows(InvalidParameterException.class, () -> {
+        Exception exception = assertThrows(ValidationException.class, () -> {
             Password.of("12345");
         });
         assertEquals("Field 'password' must have at least 6 characters", exception.getMessage());
@@ -38,4 +37,4 @@ public class PasswordTest {
         assertEquals(password1, password2);
         assertNotEquals(password1, password3);
     }
-} 
+}

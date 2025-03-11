@@ -14,8 +14,8 @@ public class User extends Aggregate {
     private Email email;
     private Password password;
 
-
-    private User(UUID id, Name name, Email email, Password password, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt) {
+    private User(UUID id, Name name, Email email, Password password, LocalDateTime createdAt, LocalDateTime updatedAt,
+            LocalDateTime deletedAt) {
         super(id, createdAt, updatedAt, deletedAt);
         this.name = name;
         this.email = email;
@@ -39,10 +39,10 @@ public class User extends Aggregate {
     }
 
     public static User load(UUID id, String name, String email, String password,
-                            LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt) {
+            LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt) {
         Name nameObj = Name.of(name);
         Email emailObj = Email.of(email);
-        Password passwordObj = Password.of(password);
+        Password passwordObj = password != null ? Password.of(password) : null;
         return new User(id, nameObj, emailObj, passwordObj, createdAt, updatedAt, deletedAt);
     }
 
@@ -83,27 +83,6 @@ public class User extends Aggregate {
     public void delete() {
         markAsDeleted();
     }
-
-    // private static void validateName(String name) {
-    //     Validator.validateRequiredField("name", name);
-    //     Validator.checkMinLength(name, 3, "name");
-    // }
-
-    // private static void validateEmail(String email) {
-    //     Validator.validateRequiredField("email", email);
-    //     Validator.validateEmailFormat(email);
-    // }
-
-    // public static void validatePassword(String password) {
-    //     Validator.validateRequiredField("password", password);
-    //     Validator.checkMinLength(password, 6, "password");
-    // }
-
-    // private static void validateAllFields(String name, String email, String password) {
-    //     validateName(name);
-    //     validateEmail(email);
-    //     validatePassword(password);
-    // }
 
     public Name getName() {
         return name;

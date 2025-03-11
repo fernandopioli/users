@@ -41,8 +41,7 @@ import com.pioli.users.application.usecases.UpdateUserUseCase;
 import com.pioli.users.config.GlobalExceptionHandler;
 import com.pioli.users.domain.aggregate.User;
 import com.pioli.users.domain.exceptions.AlreadyExistsException;
-import com.pioli.users.domain.exceptions.InvalidParameterException;
-import com.pioli.users.domain.exceptions.RequiredParameterException;
+import com.pioli.users.domain.exceptions.ValidationException;
 import com.pioli.users.domain.exceptions.ResourceNotFoundException;
 import com.pioli.users.domain.pagination.Page;
 import com.pioli.users.domain.pagination.Pagination;
@@ -82,14 +81,13 @@ public class UserControllerTest {
     void setUp() {
         userId = UUID.randomUUID();
         existingUser = User.load(
-            userId,
-            "Existing Name",
-            "existing@example.com",
-            "existingHashedPassword",
-            LocalDateTime.now(),
-            LocalDateTime.now(),
-            null
-        );
+                userId,
+                "Existing Name",
+                "existing@example.com",
+                "existingHashedPassword",
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                null);
     }
 
     @Test
@@ -104,71 +102,70 @@ public class UserControllerTest {
         when(createUserUseCase.execute(eq("Any Name"), eq("mail@example.com"), eq("123456")))
                 .thenReturn(mockUser);
 
-
-                mockMvc.perform(post("/users")
+        mockMvc.perform(post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(mockUser.getId().toString()))
                 .andExpect(jsonPath("$.name").value(mockUser.getName().getValue()))
                 .andExpect(jsonPath("$.email").value(mockUser.getEmail().getValue()));
-                verify(createUserUseCase, times(1)).execute(eq("Any Name"), eq("mail@example.com"), eq("123456"));
+        verify(createUserUseCase, times(1)).execute(eq("Any Name"), eq("mail@example.com"), eq("123456"));
 
     }
 
     @Test
     void shouldReturn400WhenRequiredParameterExceptionIsThrown() throws Exception {
         when(createUserUseCase.execute(any(), any(), any()))
-            .thenThrow(new RequiredParameterException("Name is required"));
+                .thenThrow(new ValidationException("Name is required"));
 
         mockMvc.perform(post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                    {
-                      "email": "john@example.com",
-                      "password": "123456"
-                    }
-                """))
+                            {
+                              "email": "john@example.com",
+                              "password": "123456"
+                            }
+                        """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400))
-                .andExpect(jsonPath("$.name").value("REQUIRED_PARAM"))
+                .andExpect(jsonPath("$.name").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.message").value("Name is required"));
     }
 
     @Test
     void shouldReturn400WhenInvalidParameterExceptionIsThrown() throws Exception {
         when(createUserUseCase.execute(anyString(), anyString(), anyString()))
-            .thenThrow(new InvalidParameterException("Invalid email format"));
+                .thenThrow(new ValidationException("Invalid email format"));
 
         mockMvc.perform(post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                    {
-                      "name": "Any Name",
-                      "email": "invalidEmail",
-                      "password": "123456"
-                    }
-                """))
+                            {
+                              "name": "Any Name",
+                              "email": "invalidEmail",
+                              "password": "123456"
+                            }
+                        """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400))
-                .andExpect(jsonPath("$.name").value("INVALID_PARAM"))
+                .andExpect(jsonPath("$.name").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.message").value("Invalid email format"));
     }
 
     @Test
     void shouldReturn409WhenAlreadyExistsExceptionIsThrown() throws Exception {
         when(createUserUseCase.execute(anyString(), anyString(), anyString()))
-            .thenThrow(new AlreadyExistsException("Email already exists"));
+                .thenThrow(new AlreadyExistsException("Email already exists"));
 
         mockMvc.perform(post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                    {
-                      "name": "Another Name",
-                      "email": "existing.email@anymail.com",
-                      "password": "123456"
-                    }
-                """))
+                            {
+                              "name": "Another Name",
+                              "email": "existing.email@anymail.com",
+                              "password": "123456"
+                            }
+                        """))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value(409))
                 .andExpect(jsonPath("$.name").value("ALREADY_EXISTS"))
@@ -178,17 +175,17 @@ public class UserControllerTest {
     @Test
     void shouldReturn500WhenUnexpectedExceptionIsThrown() throws Exception {
         when(createUserUseCase.execute(anyString(), anyString(), anyString()))
-            .thenThrow(new RuntimeException("Unexpected"));
+                .thenThrow(new RuntimeException("Unexpected"));
 
         mockMvc.perform(post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                    {
-                      "name": "Any Name",
-                      "email": "any@mail.com",
-                      "password": "123456"
-                    }
-                """))
+                            {
+                              "name": "Any Name",
+                              "email": "any@mail.com",
+                              "password": "123456"
+                            }
+                        """))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.code").value(500))
                 .andExpect(jsonPath("$.name").value("INTERNAL_ERROR"))
@@ -203,20 +200,20 @@ public class UserControllerTest {
         request.setPassword("newPassword");
 
         when(updateUserUseCase.execute(
-            eq(userId),
-            eq("New Name"),
-            eq("newemail@example.com"),
-            eq("newPassword")
-        )).thenReturn(existingUser);
+                eq(userId),
+                eq("New Name"),
+                eq("newemail@example.com"),
+                eq("newPassword"))).thenReturn(existingUser);
 
         mockMvc.perform(patch("/users/" + userId)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(userId.toString()))
-            .andExpect(jsonPath("$.name").value(existingUser.getName().getValue()))
-            .andExpect(jsonPath("$.email").value(existingUser.getEmail().getValue()));
-            verify(updateUserUseCase, times(1)).execute(eq(userId), eq("New Name"), eq("newemail@example.com"), eq("newPassword"));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userId.toString()))
+                .andExpect(jsonPath("$.name").value(existingUser.getName().getValue()))
+                .andExpect(jsonPath("$.email").value(existingUser.getEmail().getValue()));
+        verify(updateUserUseCase, times(1)).execute(eq(userId), eq("New Name"), eq("newemail@example.com"),
+                eq("newPassword"));
     }
 
     @Test
@@ -227,19 +224,18 @@ public class UserControllerTest {
         request.setPassword("newPassword");
 
         when(updateUserUseCase.execute(
-            eq(userId),
-            anyString(),
-            anyString(),
-            anyString()
-        )).thenThrow(new ResourceNotFoundException("User not found with id: " + userId));
+                eq(userId),
+                anyString(),
+                anyString(),
+                anyString())).thenThrow(new ResourceNotFoundException("User not found with id: " + userId));
 
         mockMvc.perform(patch("/users/" + userId)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.code").value(404))
-            .andExpect(jsonPath("$.name").value("RESOURCE_NOT_FOUND"))
-            .andExpect(jsonPath("$.message").value("User not found with id: " + userId));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value(404))
+                .andExpect(jsonPath("$.name").value("RESOURCE_NOT_FOUND"))
+                .andExpect(jsonPath("$.message").value("User not found with id: " + userId));
     }
 
     @Test
@@ -250,19 +246,18 @@ public class UserControllerTest {
         request.setPassword("123");
 
         when(updateUserUseCase.execute(
-            eq(userId),
-            anyString(),
-            anyString(),
-            eq("123")
-        )).thenThrow(new InvalidParameterException("Field 'password' must have at least 6 characters"));
+                eq(userId),
+                anyString(),
+                anyString(),
+                eq("123"))).thenThrow(new ValidationException("Field 'password' must have at least 6 characters"));
 
         mockMvc.perform(patch("/users/" + userId)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.code").value(400))
-            .andExpect(jsonPath("$.name").value("INVALID_PARAM"))
-            .andExpect(jsonPath("$.message").value("Field 'password' must have at least 6 characters"));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.name").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.message").value("Field 'password' must have at least 6 characters"));
     }
 
     @Test
@@ -273,19 +268,18 @@ public class UserControllerTest {
         request.setPassword("123");
 
         when(updateUserUseCase.execute(
-            eq(userId),
-            anyString(),
-            eq("existing.email@example.com"),
-            anyString()
-        )).thenThrow(new AlreadyExistsException("Email already exists"));
+                eq(userId),
+                anyString(),
+                eq("existing.email@example.com"),
+                anyString())).thenThrow(new AlreadyExistsException("Email already exists"));
 
         mockMvc.perform(patch("/users/" + userId)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isConflict())
-            .andExpect(jsonPath("$.code").value(409))
-            .andExpect(jsonPath("$.name").value("ALREADY_EXISTS"))
-            .andExpect(jsonPath("$.message").value("Email already exists"));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value(409))
+                .andExpect(jsonPath("$.name").value("ALREADY_EXISTS"))
+                .andExpect(jsonPath("$.message").value("Email already exists"));
     }
 
     @Test
@@ -300,14 +294,15 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.id").value(userId.toString()))
                 .andExpect(jsonPath("$.name").value("Test User"))
                 .andExpect(jsonPath("$.email").value("test@example.com"));
-                verify(findUserByIdUseCase, times(1)).execute(eq(userId));
+        verify(findUserByIdUseCase, times(1)).execute(eq(userId));
     }
 
     @Test
     void shouldReturnNotFoundWhenUserDoesNotExistOnFindById() throws Exception {
         UUID userId = UUID.randomUUID();
 
-        when(findUserByIdUseCase.execute(userId)).thenThrow(new ResourceNotFoundException("User not found with id: " + userId));
+        when(findUserByIdUseCase.execute(userId))
+                .thenThrow(new ResourceNotFoundException("User not found with id: " + userId));
 
         mockMvc.perform(get("/users/" + userId))
                 .andExpect(status().isNotFound())
@@ -358,9 +353,10 @@ public class UserControllerTest {
     @Test
     void shouldListAllUsersSuccessfully() throws Exception {
         List<User> users = Arrays.asList(
-                User.load(UUID.randomUUID(), "User One", "user1@example.com", "hashedPassword", LocalDateTime.now(), LocalDateTime.now(), null),
-                User.load(UUID.randomUUID(), "User Two", "user2@example.com", "hashedPassword", LocalDateTime.now(), LocalDateTime.now(), null)
-        );
+                User.load(UUID.randomUUID(), "User One", "user1@example.com", "hashedPassword", LocalDateTime.now(),
+                        LocalDateTime.now(), null),
+                User.load(UUID.randomUUID(), "User Two", "user2@example.com", "hashedPassword", LocalDateTime.now(),
+                        LocalDateTime.now(), null));
 
         Page<User> userPage = new Page<>(users, 0, 2, 2, 1);
 
@@ -377,9 +373,10 @@ public class UserControllerTest {
     @Test
     void shouldListUsersWithFiltersSuccessfully() throws Exception {
         List<User> users = Arrays.asList(
-                User.load(UUID.randomUUID(), "User One", "user1@example.com", "hashedPassword", LocalDateTime.now(), LocalDateTime.now(), null),
-                User.load(UUID.randomUUID(), "User Two", "user2@example.com", "hashedPassword", LocalDateTime.now(), LocalDateTime.now(), null)
-        );
+                User.load(UUID.randomUUID(), "User One", "user1@example.com", "hashedPassword", LocalDateTime.now(),
+                        LocalDateTime.now(), null),
+                User.load(UUID.randomUUID(), "User Two", "user2@example.com", "hashedPassword", LocalDateTime.now(),
+                        LocalDateTime.now(), null));
 
         Page<User> userPage = new Page<>(users, 0, 1, 1, 1);
 
@@ -398,14 +395,13 @@ public class UserControllerTest {
         // Arrange
         UUID userId = UUID.randomUUID();
         User user = User.load(
-            userId,
-            "Alice",
-            "alice@example.com",
-            "hashedPassword",
-            LocalDateTime.now(),
-            LocalDateTime.now(),
-            null
-        );
+                userId,
+                "Alice",
+                "alice@example.com",
+                "hashedPassword",
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                null);
 
         List<User> users = Collections.singletonList(user);
         Page<User> userPage = new Page<>(users, 0, 10, 1, 1);
@@ -419,9 +415,9 @@ public class UserControllerTest {
         params.add("unknown", "value");
 
         mockMvc.perform(get("/users").params(params))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.users[0].name").value("Alice"))
-            .andExpect(jsonPath("$._embedded.users[0].email").value("alice@example.com"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.users[0].name").value("Alice"))
+                .andExpect(jsonPath("$._embedded.users[0].email").value("alice@example.com"));
 
         ArgumentCaptor<Pagination> paginationCaptor = ArgumentCaptor.forClass(Pagination.class);
         verify(listAllUsersUseCase, times(1)).execute(paginationCaptor.capture());

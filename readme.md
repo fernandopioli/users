@@ -80,8 +80,22 @@ COMMENTS:
 - Disparando Eventos na criacao de usuarios
 - Paginacao personalizada
 - spring configurations and annotations on the config and presentation layer
+- usando tester do spring ( é o Junit? )
 TODO:
+- Continuar app mesmo com erro no kafka ou handle errors
 - Criar uma interface para usecases
 - Falar que poderia ter um tratamento de erro mais robusto devolvendo todos os erros de uma vez só
 - Criar exceptions de required e missed mais detalhadas
 - Ter uma classe de uniqueUUID
+- Profile em PROD
+- Profile de testes
+- Add a prod DB
+- correct config log e em prod
+- improve domain events - more rich
+
+TESTS:
+- melhorar os testes do entry point
+- Testar melhor o controller com mock
+- checar o e2e
+- colocar testes em paralelo
+- testar kafa

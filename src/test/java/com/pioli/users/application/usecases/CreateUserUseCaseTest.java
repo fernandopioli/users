@@ -14,10 +14,10 @@ import com.pioli.users.application.interfaces.PasswordHasher;
 import com.pioli.users.application.interfaces.UserRepository;
 import com.pioli.users.domain.aggregate.User;
 import com.pioli.users.domain.exceptions.AlreadyExistsException;
-import com.pioli.users.domain.exceptions.InvalidParameterException;
+import com.pioli.users.domain.exceptions.ValidationException;
 
 public class CreateUserUseCaseTest {
-    
+
     private CreateUserUseCase createUserUseCase;
     private UserRepository userRepository;
     private PasswordHasher passwordHasher;
@@ -71,7 +71,7 @@ public class CreateUserUseCaseTest {
 
         when(userRepository.existsByEmail("any@mail.com")).thenReturn(false);
 
-        InvalidParameterException exception = assertThrows(InvalidParameterException.class, () -> {
+        ValidationException exception = assertThrows(ValidationException.class, () -> {
             createUserUseCase.execute("Any Name", "any@mail.com", password);
         });
 
