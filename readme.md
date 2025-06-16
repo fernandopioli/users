@@ -92,6 +92,7 @@ TODO:
 - Add a prod DB
 - correct config log e em prod
 - improve domain events - more rich
+- domain->entity -> testar quando é passado dates para entity
 
 TESTS:
 - melhorar os testes do entry point
